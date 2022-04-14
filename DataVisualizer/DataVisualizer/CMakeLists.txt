@@ -11,8 +11,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network REQUIRED)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -44,7 +44,7 @@ else()
     endif()
 endif()
 
-target_link_libraries(DataVisualizer PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(DataVisualizer PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network)
 
 set_target_properties(DataVisualizer PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
