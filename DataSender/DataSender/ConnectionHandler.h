@@ -11,6 +11,7 @@ class ConnectionHandler : public QObject
 public:
     ConnectionHandler(quint16 port);
     static QHostAddress getIpAddress();
+    ~ConnectionHandler();
 
 private slots:
     void establishConnection();
