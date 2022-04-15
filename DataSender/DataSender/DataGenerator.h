@@ -5,6 +5,7 @@
 
 class DataGenerator
 {
+public:
     /**
      * Generates a sequence of random integral 16bits values of length @b length
      */

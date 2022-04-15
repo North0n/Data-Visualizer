@@ -2,17 +2,21 @@
 
 #include <QtConcurrent>
 
-quint16 DataSender::_maxDowntimeTime = 5 * 60;
-quint16 DataSender::_sequenceLength = 256;
+int DataSender::_maxDowntimeTime = 30000;
+quint16 DataSender::_sequenceLength = 16;
 
-DataSender::DataSender(quint16 port, const QHostAddress &host, quint16 clientPort)
-    : _port(port), _client(host), _clientPort(clientPort), _timer(this)
+DataSender::DataSender(quint16 port, const QHostAddress &host, quint16 clientPort, QObject *parent)
+    : QObject(parent),
+    _port(port),
+    _client(host),
+    _clientPort(clientPort),
+    _timer(this)
 {
     _socket.bind(QHostAddress::Any, _port);
     connect(&_socket, &QUdpSocket::readyRead, this, &DataSender::read);
 
     connect(&_timer, &QTimer::timeout, this, &DataSender::checkConnection);
-    _timer.start();
+    _timer.start(_maxDowntimeTime);
 }
 
 void DataSender::read()
@@ -24,7 +28,7 @@ void DataSender::read()
     _socket.readDatagram(datagram.data(), datagram.size(), &address, &port);
     if (address != _client || port != _clientPort)
         return;
-    _prevClientSignalTime = QDateTime::currentSecsSinceEpoch();
+    _hadClientSignal = true;
 
     quint8 commandIndex;
     QDataStream in(&datagram, QIODevice::ReadOnly);
@@ -38,7 +42,7 @@ void DataSender::read()
 
 void DataSender::startSending()
 {
-    QtConcurrent::run([this] { send(); });
+    auto result = QtConcurrent::run([this] { send(); });
 }
 
 void DataSender::send()
@@ -62,10 +66,12 @@ void DataSender::ping(const QDataStream &datagram)
 
 void DataSender::checkConnection()
 {
-    quint64 currTime = QDateTime::currentSecsSinceEpoch();
-    if (currTime - _prevClientSignalTime > _maxDowntimeTime) {
+    if (!_hadClientSignal) {
         _isConnected = false;
+        emit connectionAborted();
+        qDebug() << "Client disconnected";
     }
+    _hadClientSignal = false;
 }
 
 int DataSender::getMaxDowntimeTime()
@@ -76,4 +82,10 @@ int DataSender::getMaxDowntimeTime()
 void DataSender::setMaxDowntimeTime(quint16 maxDowntimeTime)
 {
     _maxDowntimeTime = maxDowntimeTime;
+}
+
+void DataSender::quit(const QDataStream &datagram)
+{
+    _isConnected = false;
+    emit connectionAborted();
 }

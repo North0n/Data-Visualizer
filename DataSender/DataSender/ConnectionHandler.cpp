@@ -6,7 +6,7 @@
 ConnectionHandler::ConnectionHandler(quint16 port)
     : _port(port)
 {
-    _receiver.bind(QHostAddress::Any, _port);
+    _receiver.bind(QHostAddress::AnyIPv4, _port);
     connect(&_receiver, &QUdpSocket::readyRead, this, &ConnectionHandler::establishConnection);
     qDebug() << "Waiting for connections on IP: " << getIpAddress().toString() << " port: " << _port;
 }
@@ -15,11 +15,12 @@ void ConnectionHandler::establishConnection()
 {
     QHostAddress address;
     quint16 port;
-    _receiver.readDatagram(nullptr, _receiver.pendingDatagramSize(), &address, &port);
+    QByteArray bytes(_receiver.pendingDatagramSize(), '\0');
+    _receiver.readDatagram(bytes.data(), _receiver.pendingDatagramSize(), &address, &port);
     disconnect(&_receiver, &QUdpSocket::readyRead, this, &ConnectionHandler::establishConnection);
     qDebug() << "Established connection with IP: " << address.toString() << " Port: " << port;
 
-    _dataSender = new DataSender(_nextDataSenderPort++, address, port);
+    _dataSender = new DataSender(_nextDataSenderPort++, address, port, this);
     _dataSender->startSending();
 }
 
@@ -31,9 +32,4 @@ QHostAddress ConnectionHandler::getIpAddress()
             return address;
     }
     return QHostAddress::LocalHost;
-}
-
-ConnectionHandler::~ConnectionHandler()
-{
-    delete _dataSender;
 }

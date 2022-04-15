@@ -5,8 +5,8 @@
 
 QByteArray DataGenerator::random(quint16 length)
 {
-    // Divided by 2 because QRandomGenerator accepts only containers of quint32 and quint64
-    QVector<quint32> bytes(length / sizeof(quint16) / 2);
+    QVector<quint32> bytes(length / sizeof(quint32));
     QRandomGenerator::global()->fillRange(bytes.data(), bytes.size());
-    return reinterpret_cast<char*>(bytes.data());
+    QByteArray arr(reinterpret_cast<char*>(bytes.data()), length);
+    return arr;
 }
