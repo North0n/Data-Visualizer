@@ -7,7 +7,7 @@ class DataGenerator
 {
 public:
     /**
-     * Generates a sequence of random integral 16bits values of length @b length
+     * Generates a sequence of random double values of length @b length
      */
     static QByteArray random(quint16 length);
 };

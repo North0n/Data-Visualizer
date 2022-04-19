@@ -57,7 +57,7 @@ private:
     quint16 _clientPort;
     QUdpSocket _socket;
 
-    /// Datagram size in bytes
+    /// Datagram size in amount of values of type double
     static quint16 _sequenceLength;
     std::function<QByteArray(quint16 length)> _currentGenerator = DataGenerator::random;
 

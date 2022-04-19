@@ -2,11 +2,14 @@
 
 #include <QRandomGenerator>
 #include <QVector>
+#include "qdebug.h"
 
 QByteArray DataGenerator::random(quint16 length)
 {
-    QVector<quint32> bytes(length / sizeof(quint32));
-    QRandomGenerator::global()->fillRange(bytes.data(), bytes.size());
-    QByteArray arr(reinterpret_cast<char*>(bytes.data()), length);
-    return arr;
+    QVector<double> values(length);
+    for (auto &value : values)
+        value = QRandomGenerator::global()->generateDouble();
+
+    qDebug() << values;
+    return QByteArray(reinterpret_cast<char*>(values.data()), length * sizeof(double));
 }
