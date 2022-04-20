@@ -37,7 +37,14 @@ void DataSender::read()
     else
         return;
 
-    _commandHandlers[commandIndex](in); // TODO probably isn't necessary
+    // By default, just ignore message (but _hadClientSignal variable)
+    switch (commandIndex) {
+        case static_cast<quint8>(Commands::ChangeRandom):
+            break;
+        case static_cast<quint8>(Commands::Quit):
+            _isConnected = false;
+            break;
+    }
 }
 
 void DataSender::changeRandom(const QDataStream& datagram)

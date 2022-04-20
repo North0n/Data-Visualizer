@@ -26,7 +26,7 @@ public:
 
     static int getMaxDowntimeTime();
 
-    enum COMMANDS
+    enum class Commands
     {
         ChangeRandom,
         Quit
@@ -42,6 +42,7 @@ private:
     void checkConnection();
     void send();
 
+    // TODO should delete this if user switch
     QVector<std::function<void(const QDataStream&)>> _commandHandlers =
         {
                 [this](const QDataStream &datagram) { changeRandom(datagram); },
