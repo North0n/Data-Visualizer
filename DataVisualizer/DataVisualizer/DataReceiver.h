@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QUdpSocket>
 #include <QByteArray>
+#include <QPointer>
 
 class DataReceiver : public QObject
 {
@@ -23,7 +24,7 @@ private:
 
     // Port which receiver "listens" to
     quint16 _port;
-    QUdpSocket *_receiver;
+    QPointer<QUdpSocket> _receiver;
 };
 
 

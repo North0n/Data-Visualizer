@@ -11,15 +11,21 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets OpenGL Gui PrintSupport Network Concurrent REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets OpenGL Gui PrintSupport Network Concurrent REQUIRED)
 
 set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
-)
+        qcustomplot.h
+        qcustomplot.cpp
+        DataReceiver.h
+        DataReceiver.cpp
+        connection.cpp
+        connection.h
+        connection.ui stylesheet.h my_algorithm.h)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(DataVisualizer
@@ -44,7 +50,17 @@ else()
     endif()
 endif()
 
-target_link_libraries(DataVisualizer PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network)
+target_link_libraries(DataVisualizer PRIVATE
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::PrintSupport
+    Qt${QT_VERSION_MAJOR}::OpenGL
+    Qt${QT_VERSION_MAJOR}::Gui
+    Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    OpenGL32
+)
+
+add_definitions(-DQCUSTOMPLOT_USE_OPENGL)
 
 set_target_properties(DataVisualizer PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
