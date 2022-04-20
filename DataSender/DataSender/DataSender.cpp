@@ -32,7 +32,7 @@ void DataSender::read()
 
     quint8 commandIndex;
     QDataStream in(&datagram, QIODevice::ReadOnly);
-    if (in.device()->size() > sizeof(quint8))
+    if (in.device()->size() >= sizeof(quint8))
         in >> commandIndex;
     else
         return;
@@ -42,7 +42,7 @@ void DataSender::read()
         case static_cast<quint8>(Commands::ChangeRandom):
             break;
         case static_cast<quint8>(Commands::Quit):
-            _isConnected = false;
+            abortConnection();
             break;
     }
 }
@@ -69,7 +69,7 @@ void DataSender::sendConfiguration()
 
 void DataSender::startSending()
 {
-    auto result = QtConcurrent::run([this] { send(); });
+    QtConcurrent::run([this] { send(); });
 }
 
 void DataSender::send()
@@ -84,10 +84,7 @@ void DataSender::send()
 void DataSender::checkConnection()
 {
     if (!_hadClientSignal) {
-        _isConnected = false;
-        emit connectionAborted();
-        disconnect(&_timer, &QTimer::timeout, this, &DataSender::checkConnection);
-        qDebug() << "Client disconnected";
+        abortConnection();
     }
     _hadClientSignal = false;
 }
@@ -100,4 +97,12 @@ int DataSender::getMaxDowntimeTime()
 void DataSender::setMaxDowntimeTime(quint16 maxDowntimeTime)
 {
     _maxDowntimeTime = maxDowntimeTime;
+}
+
+void DataSender::abortConnection()
+{
+    _isConnected = false;
+    emit connectionAborted();
+    disconnect(&_timer, &QTimer::timeout, this, &DataSender::checkConnection);
+    qDebug() << "Client disconnected";
 }

@@ -64,6 +64,7 @@ void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
             ui->sbRange->setMinimum(_displayingPointsCount);
             _keys.resize(_displayingPointsCount);
             _values.resize(_displayingPointsCount);
+            _dataReceiver->setServerPort(_serverPort);
 
             // If data left, then it's already received data generated for displaying
             receiveData(in.device()->readAll());

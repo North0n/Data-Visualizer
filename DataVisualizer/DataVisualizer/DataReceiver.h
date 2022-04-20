@@ -15,6 +15,8 @@ public:
                  QObject *parent = nullptr);
     ~DataReceiver() override;
 
+    void setServerPort(quint16 port) {_serverPort = port; }
+
     void refreshConnection();
 
     void quit();

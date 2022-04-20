@@ -40,6 +40,7 @@ private slots:
 
 private:
     void checkConnection();
+    void abortConnection();
     void send();
 
     // TODO should delete this if user switch

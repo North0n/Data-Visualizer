@@ -32,7 +32,7 @@ void DataReceiver::refreshConnection()
 void DataReceiver::quit()
 {
     QByteArray data;
-    QDataStream out(data);
-    out << Commands::Quit;
+    QDataStream command(&data, QIODevice::WriteOnly);
+    command << static_cast<quint8>(Commands::Quit);
     _receiver->writeDatagram(data, _serverAddress, _serverPort);
 }
