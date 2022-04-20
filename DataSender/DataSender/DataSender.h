@@ -4,7 +4,6 @@
 #include <functional>
 #include <QObject>
 #include <QString>
-#include <QSet>
 #include <QHostAddress>
 #include <QUdpSocket>
 #include <QDataStream>
@@ -19,6 +18,8 @@ class DataSender : public QObject
 public:
     DataSender(quint16 port, const QHostAddress &host, quint16 clientPort, QObject *parent = nullptr);
 
+    void sendConfiguration();
+
     void startSending();
 
     static void setMaxDowntimeTime(quint16 maxDowntimeTime);
@@ -27,7 +28,6 @@ public:
 
     enum COMMANDS
     {
-        Ping,
         ChangeRandom,
         Quit
     };
@@ -43,17 +43,15 @@ private:
     void send();
 
     QVector<std::function<void(const QDataStream&)>> _commandHandlers =
-            {
-                    [this](const QDataStream &datagram) { ping(datagram); },
-                    [this](const QDataStream &datagram) { changeRandom(datagram); },
-                    [this](const QDataStream &datagram) { quit(datagram); }
-            };
+        {
+                [this](const QDataStream &datagram) { changeRandom(datagram); },
+                [this](const QDataStream &datagram) { quit(datagram); }
+        };
     void changeRandom(const QDataStream &datagram);
-    void ping(const QDataStream &datagram);
     void quit(const QDataStream &datagram);
 
     quint16 _port;
-    QHostAddress _client;
+    QHostAddress _clientAddress;
     quint16 _clientPort;
     QUdpSocket _socket;
 

@@ -21,6 +21,7 @@ void ConnectionHandler::establishConnection()
     qDebug() << "Established connection with IP: " << address.toString() << " Port: " << port;
 
     _dataSender = new DataSender(_nextDataSenderPort++, address, port, this);
+    _dataSender->sendConfiguration();
     _dataSender->startSending();
 }
 
