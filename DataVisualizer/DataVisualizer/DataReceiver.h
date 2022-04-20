@@ -11,9 +11,19 @@ class DataReceiver : public QObject
     Q_OBJECT
 
 public:
-    DataReceiver(quint16 port, QObject *parent = nullptr);
+    DataReceiver(quint16 port, const QHostAddress &serverAddress, quint16 serverPort,
+                 QObject *parent = nullptr);
+    ~DataReceiver() override;
 
-    void send(const QByteArray &bytes, const QHostAddress &host, quint16 port);
+    void refreshConnection();
+
+    void quit();
+
+    enum class Commands
+    {
+        ChangeRandom,
+        Quit
+    };
 
 signals:
     void dataReceived(const QByteArray &data);
@@ -21,6 +31,9 @@ signals:
 private:
 
     void getData();
+
+    QHostAddress _serverAddress;
+    quint16 _serverPort;
 
     // Port which receiver "listens" to
     quint16 _port;

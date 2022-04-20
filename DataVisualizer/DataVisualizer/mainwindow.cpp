@@ -43,10 +43,10 @@ void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
     _serverPort = port;
 
     delete _dataReceiver;
-    _dataReceiver = new DataReceiver(_port, this);
+    _dataReceiver = new DataReceiver(_port, host, port, this);
 
     // Send echo request to server to get his configuration
-    refreshConnection();
+    _dataReceiver->refreshConnection();
 
     // Receive configuration information about server
     auto * const connection = new QMetaObject::Connection;
@@ -73,10 +73,11 @@ void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
             delete connection;
             connect(_dataReceiver, &DataReceiver::dataReceived, this, &MainWindow::receiveData);
 
-            // Timer for telling server that this client is still alive and server should send data
+            // Timer for telling server that this client is still alive and server should refreshConnection data
             delete _refreshConnectionTimer;
             _refreshConnectionTimer = new QTimer(this);
-            connect(_refreshConnectionTimer, &QTimer::timeout, this, &MainWindow::refreshConnection);
+            connect(_refreshConnectionTimer, &QTimer::timeout,
+                    _dataReceiver, &DataReceiver::refreshConnection);
             _refreshConnectionTimer->start(_serverMaxDowntime / 2);
         });
 }
@@ -98,11 +99,6 @@ void MainWindow::receiveData(const QByteArray &bytes)
     ui->dataDisplay->graph(0)->setData(_keys, _values);
     ui->dataDisplay->graph(0)->rescaleAxes();
     ui->dataDisplay->replot();
-}
-
-void MainWindow::refreshConnection()
-{
-    _dataReceiver->send(QByteArray("q"), *_serverAddress, _serverPort);
 }
 
 void MainWindow::changeRange(int value)

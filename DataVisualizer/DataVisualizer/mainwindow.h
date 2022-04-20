@@ -23,7 +23,6 @@ private slots:
     void on_actConnect_triggered();
     void connectToServer(const QHostAddress &host, quint16 port);
     void receiveData(const QByteArray &byteArray);
-    void refreshConnection();
     void changeRange(int value);
 
 private:
