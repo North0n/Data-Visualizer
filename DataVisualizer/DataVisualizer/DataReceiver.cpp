@@ -26,7 +26,10 @@ DataReceiver::~DataReceiver()
 
 void DataReceiver::refreshConnection()
 {
-    _receiver->writeDatagram(QByteArray("q"), _serverAddress, _serverPort);
+    QByteArray data;
+    QDataStream command(&data, QIODevice::WriteOnly);
+    command << static_cast<quint8>(Commands::NoOperation);
+    _receiver->writeDatagram(data, _serverAddress, _serverPort);
 }
 
 void DataReceiver::quit()
@@ -34,5 +37,14 @@ void DataReceiver::quit()
     QByteArray data;
     QDataStream command(&data, QIODevice::WriteOnly);
     command << static_cast<quint8>(Commands::Quit);
+    _receiver->writeDatagram(data, _serverAddress, _serverPort);
+}
+
+void DataReceiver::setFunction(quint8 funcIndex)
+{
+    QByteArray data;
+    QDataStream command(&data, QIODevice::WriteOnly);
+    command << static_cast<quint8>(Commands::SetFunc)
+            << funcIndex;
     _receiver->writeDatagram(data, _serverAddress, _serverPort);
 }

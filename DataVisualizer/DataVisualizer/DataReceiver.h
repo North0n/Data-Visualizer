@@ -13,18 +13,30 @@ class DataReceiver : public QObject
 public:
     DataReceiver(quint16 port, const QHostAddress &serverAddress, quint16 serverPort,
                  QObject *parent = nullptr);
+
     ~DataReceiver() override;
 
     void setServerPort(quint16 port) {_serverPort = port; }
 
     void refreshConnection();
 
+    void setFunction(quint8 funcIndex);
+
     void quit();
 
     enum class Commands
     {
-        ChangeRandom,
-        Quit
+        SetFunc,
+        Quit,
+        SetStep,
+        NoOperation,
+    };
+
+    enum Functions
+    {
+        Random = 0,
+        Sin,
+        Cos,
     };
 
 signals:

@@ -29,7 +29,11 @@ private slots:
     void receiveData(const QByteArray &byteArray);
     void changeRange(int value);
 
+    void on_cbFunction_currentIndexChanged(int index);
+
 private:
+
+    void fillComboBoxFunctions();
 
     static quint16 _port;
     quint16 _displayingPointsCount = 400;

@@ -7,7 +7,6 @@
 #include <QDataStream>
 #include "my_algorithm.h"
 
-// TODO Добавить возможность изменения порта через пользовательский интерфейс
 quint16 MainWindow::_port = 20001;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -15,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    fillComboBoxFunctions();
 
     connect(ui->sbRange, &QSpinBox::valueChanged, this, &MainWindow::changeRange);
 
@@ -68,6 +68,7 @@ void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
             _keys.resize(_displayingPointsCount);
             _values.resize(_displayingPointsCount);
             _dataReceiver->setServerPort(_serverPort);
+            _dataReceiver->setFunction(ui->cbFunction->currentData().toInt());
 
             // If data left, then it's already received data generated for displaying
             receiveData(in.device()->readAll());
@@ -143,5 +144,20 @@ void MainWindow::on_actDisconnect_triggered()
 {
     delete _dataReceiver;
     _dataReceiver = nullptr;
+}
+
+
+void MainWindow::on_cbFunction_currentIndexChanged(int index)
+{
+    if (_dataReceiver == nullptr)
+        return;
+    _dataReceiver->setFunction(ui->cbFunction->currentData().toInt());
+}
+
+void MainWindow::fillComboBoxFunctions()
+{
+    ui->cbFunction->addItem("Случайные данные", static_cast<int>(DataReceiver::Random));
+    ui->cbFunction->addItem("Синус", static_cast<int>(DataReceiver::Sin));
+    ui->cbFunction->addItem("Косинус", static_cast<int>(DataReceiver::Cos));
 }
 
