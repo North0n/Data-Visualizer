@@ -17,12 +17,19 @@ void ConnectionHandler::establishConnection()
     quint16 port;
     QByteArray bytes(_receiver.pendingDatagramSize(), '\0');
     _receiver.readDatagram(bytes.data(), _receiver.pendingDatagramSize(), &address, &port);
-    disconnect(&_receiver, &QUdpSocket::readyRead, this, &ConnectionHandler::establishConnection);
+    auto client = ClientAddress(address.toIPv4Address(), port);
+    if (_connectedClients.contains(client))
+        return;
     qDebug() << "Established connection with IP: " << address.toString() << " Port: " << port;
 
-    _dataSender = new DataSender(_nextDataSenderPort++, address, port, this);
-    _dataSender->sendConfiguration();
-    _dataSender->startSending();
+    // TODO изменить алгоритм выдачи порта (_nextDataSenderPort++), потому что, когда порты закончатся
+    //  (переполнится quint16) порты начнут выдаваться с 0, что не есть хорошо. При этом если начать выдавать
+    //  порты опять с того, с которого начинали изначально (30000) может получиться такое, что порт 30000 всё ещё занят
+    _connectedClients[client] = new DataSender(_nextDataSenderPort++, address, port, this);
+    connect(_connectedClients[client], &DataSender::connectionAborted,
+            this, &ConnectionHandler::abortConnection);
+    _connectedClients[client]->sendConfiguration();
+    _connectedClients[client]->startSending();
 }
 
 QHostAddress ConnectionHandler::getIpAddress()
@@ -33,4 +40,11 @@ QHostAddress ConnectionHandler::getIpAddress()
             return address;
     }
     return QHostAddress::LocalHost;
+}
+
+void ConnectionHandler::abortConnection(const ClientAddress &address)
+{
+    delete _connectedClients[address];
+    _connectedClients.remove(address);
+    qDebug() << "Aborted connection with " << QHostAddress(address.first).toString() << " " << address.second;
 }

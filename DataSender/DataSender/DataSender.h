@@ -11,6 +11,9 @@
 #include <QByteArray>
 #include "DataGenerator.h"
 
+// QPair<quint32 , quint16> stands for a clients IPv4 address and port
+using ClientAddress = QPair<quint32, quint16>;
+
 class DataSender : public QObject
 {
     Q_OBJECT
@@ -33,7 +36,7 @@ public:
     };
 
 signals:
-    void connectionAborted();
+    void connectionAborted(const ClientAddress &address);
 
 private slots:
     void read();
@@ -46,8 +49,8 @@ private:
     // TODO should delete this if user switch
     QVector<std::function<void(const QDataStream&)>> _commandHandlers =
         {
-                [this](const QDataStream &datagram) { changeRandom(datagram); },
-                [this](const QDataStream &datagram) { quit(datagram); }
+            [this](const QDataStream &datagram) { changeRandom(datagram); },
+            [this](const QDataStream &datagram) { quit(datagram); }
         };
     void changeRandom(const QDataStream &datagram);
     void quit(const QDataStream &datagram);

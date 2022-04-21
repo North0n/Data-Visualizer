@@ -102,7 +102,7 @@ void DataSender::setMaxDowntimeTime(quint16 maxDowntimeTime)
 void DataSender::abortConnection()
 {
     _isConnected = false;
-    emit connectionAborted();
+    emit connectionAborted(ClientAddress(_clientAddress.toIPv4Address(), _clientPort));
     disconnect(&_timer, &QTimer::timeout, this, &DataSender::checkConnection);
     qDebug() << "Client disconnected";
 }
