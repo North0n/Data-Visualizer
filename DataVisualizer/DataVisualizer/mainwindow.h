@@ -22,6 +22,7 @@ public:
 
 private slots:
     void on_actConnect_triggered();
+    void on_actDisconnect_triggered();
     void on_actChangePort_triggered();
     void connectToServer(const QHostAddress &host, quint16 port);
     void changePort(quint16 port);

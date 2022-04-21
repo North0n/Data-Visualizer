@@ -138,3 +138,10 @@ void MainWindow::changePort(quint16 port)
     _dataReceiver = nullptr;
 }
 
+
+void MainWindow::on_actDisconnect_triggered()
+{
+    delete _dataReceiver;
+    _dataReceiver = nullptr;
+}
+

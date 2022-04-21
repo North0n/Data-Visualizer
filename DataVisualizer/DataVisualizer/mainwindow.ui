@@ -169,6 +169,7 @@
      <string>Сеть</string>
     </property>
     <addaction name="actConnect"/>
+    <addaction name="actDisconnect"/>
    </widget>
    <widget class="QMenu" name="mSettings">
     <property name="title">
@@ -193,6 +194,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actDisconnect">
+   <property name="text">
+    <string>Отключиться</string>
    </property>
   </action>
  </widget>
