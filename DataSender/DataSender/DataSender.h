@@ -25,14 +25,12 @@ public:
 
     void startSending();
 
-    static void setMaxDowntimeTime(quint16 maxDowntimeTime);
-
-    static int getMaxDowntimeTime();
-
     enum class Commands
     {
-        ChangeRandom,
-        Quit
+        SetFunc,
+        Quit,
+        SetStep,
+        NoOperation,
     };
 
 signals:
@@ -46,15 +44,6 @@ private:
     void abortConnection();
     void send();
 
-    // TODO should delete this if user switch
-    QVector<std::function<void(const QDataStream&)>> _commandHandlers =
-        {
-            [this](const QDataStream &datagram) { changeRandom(datagram); },
-            [this](const QDataStream &datagram) { quit(datagram); }
-        };
-    void changeRandom(const QDataStream &datagram);
-    void quit(const QDataStream &datagram);
-
     quint16 _port;
     QHostAddress _clientAddress;
     quint16 _clientPort;
@@ -62,7 +51,7 @@ private:
 
     /// Datagram size in amount of values of type double
     static quint16 _sequenceLength;
-    std::function<QByteArray(quint16 length)> _currentGenerator = DataGenerator::random;
+    DataGenerator _generator;
 
     QTimer _timer;
     /// Maximum time between client signals, that won't lead to disconnect

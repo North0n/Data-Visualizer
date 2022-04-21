@@ -21,6 +21,7 @@ DataSender::DataSender(quint16 port, const QHostAddress &host, quint16 clientPor
 
 void DataSender::read()
 {
+    // Reads datagram and gets information about sender
     QByteArray datagram;
     datagram.resize(_socket.pendingDatagramSize());
     QHostAddress address;
@@ -30,31 +31,27 @@ void DataSender::read()
         return;
     _hadClientSignal = true;
 
+    // Handles received command
     quint8 commandIndex;
     QDataStream in(&datagram, QIODevice::ReadOnly);
-    if (in.device()->size() >= sizeof(quint8))
-        in >> commandIndex;
-    else
-        return;
-
-    // By default, just ignore message (but _hadClientSignal variable)
+    in >> commandIndex;
     switch (commandIndex) {
-        case static_cast<quint8>(Commands::ChangeRandom):
+        case static_cast<quint8>(Commands::SetFunc):
+            quint8 funcIndex;
+            in >> funcIndex;
+            _generator.setFuncIndex(funcIndex);
             break;
         case static_cast<quint8>(Commands::Quit):
             abortConnection();
             break;
+        case static_cast<quint8>(Commands::SetStep):
+            double step;
+            in >> step;
+            _generator.setStep(step);
+            break;
+        case static_cast<quint8>(Commands::NoOperation):
+            break;
     }
-}
-
-void DataSender::changeRandom(const QDataStream& datagram)
-{
-
-}
-
-void DataSender::quit(const QDataStream &datagram)
-{
-    _isConnected = false;
 }
 
 void DataSender::sendConfiguration()
@@ -76,7 +73,7 @@ void DataSender::send()
 {
     QByteArray bytes;
     while (_isConnected) {
-        bytes = _currentGenerator(_sequenceLength);
+        bytes = _generator.getData(_sequenceLength);
         _socket.writeDatagram(bytes, _clientAddress, _clientPort);
     }
 }
@@ -87,16 +84,6 @@ void DataSender::checkConnection()
         abortConnection();
     }
     _hadClientSignal = false;
-}
-
-int DataSender::getMaxDowntimeTime()
-{
-    return _maxDowntimeTime;
-}
-
-void DataSender::setMaxDowntimeTime(quint16 maxDowntimeTime)
-{
-    _maxDowntimeTime = maxDowntimeTime;
 }
 
 void DataSender::abortConnection()
