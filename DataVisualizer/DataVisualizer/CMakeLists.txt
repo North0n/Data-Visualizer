@@ -25,7 +25,7 @@ set(PROJECT_SOURCES
         DataReceiver.cpp
         connection.cpp
         connection.h
-        connection.ui stylesheet.h my_algorithm.h)
+        connection.ui stylesheet.h my_algorithm.h formchangeport.cpp formchangeport.h formchangeport.ui)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(DataVisualizer

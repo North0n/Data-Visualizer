@@ -7,6 +7,7 @@
 #include <QDataStream>
 #include "my_algorithm.h"
 
+// TODO Добавить возможность изменения порта через пользовательский интерфейс
 quint16 MainWindow::_port = 20001;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -38,12 +39,14 @@ void MainWindow::on_actConnect_triggered()
 
 void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
 {
-    delete _serverAddress;
-    _serverAddress = new QHostAddress(host);
+    if (&host != _serverAddress) {
+        delete _serverAddress;
+        _serverAddress = new QHostAddress(host);
+    }
     _serverPort = port;
 
     delete _dataReceiver;
-    _dataReceiver = new DataReceiver(_port, host, port, this);
+    _dataReceiver = new DataReceiver(_port, *_serverAddress, _serverPort, this);
 
     // Send echo request to server to get his configuration
     _dataReceiver->refreshConnection();
@@ -80,13 +83,13 @@ void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
             connect(_refreshConnectionTimer, &QTimer::timeout,
                     _dataReceiver, &DataReceiver::refreshConnection);
             _refreshConnectionTimer->start(_serverMaxDowntime / 2);
-        });
+        }
+    );
 }
 
 void MainWindow::receiveData(const QByteArray &bytes)
 {
     int datagramSize = bytes.size() / sizeof(double);
-    // TODO обработать случай, когда размер датаграммы больше чем размер массива
     _values.remove(0, datagramSize);
     _values.append(QVector<double>(reinterpret_cast<const double*>(bytes.begin()),
                                         reinterpret_cast<const double*>(bytes.end())));
@@ -117,3 +120,21 @@ void MainWindow::changeRange(int value)
     }
     _displayingPointsCount = value;
 }
+
+void MainWindow::on_actChangePort_triggered()
+{
+    delete _formChangePort;
+    _formChangePort = new FormChangePort(_port, this);
+    connect(_formChangePort, &FormChangePort::onSavePressed, this, &MainWindow::changePort);
+    _formChangePort->show();
+}
+
+void MainWindow::changePort(quint16 port)
+{
+    if (port == _port)
+        return;
+    _port = port;
+    delete _dataReceiver;
+    _dataReceiver = nullptr;
+}
+

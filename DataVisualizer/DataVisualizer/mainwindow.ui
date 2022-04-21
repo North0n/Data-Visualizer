@@ -149,7 +149,14 @@
     </property>
     <addaction name="actConnect"/>
    </widget>
+   <widget class="QMenu" name="mSettings">
+    <property name="title">
+     <string>Настройки</string>
+    </property>
+    <addaction name="actChangePort"/>
+   </widget>
    <addaction name="mNetwork"/>
+   <addaction name="mSettings"/>
   </widget>
   <action name="actConnect">
    <property name="text">
@@ -157,6 +164,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+G</string>
+   </property>
+  </action>
+  <action name="actChangePort">
+   <property name="text">
+    <string>Порт</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
  </widget>

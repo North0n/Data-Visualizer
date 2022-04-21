@@ -5,6 +5,7 @@
 #include <QHostAddress>
 #include "DataReceiver.h"
 #include "connection.h"
+#include "formchangeport.h"
 #include <QTimer>
 
 QT_BEGIN_NAMESPACE
@@ -21,7 +22,9 @@ public:
 
 private slots:
     void on_actConnect_triggered();
+    void on_actChangePort_triggered();
     void connectToServer(const QHostAddress &host, quint16 port);
+    void changePort(quint16 port);
     void receiveData(const QByteArray &byteArray);
     void changeRange(int value);
 
@@ -39,6 +42,8 @@ private:
     QTimer *_refreshConnectionTimer = nullptr;
 
     FormConnection *_formConnection = nullptr;
+    FormChangePort *_formChangePort = nullptr;
+
     DataReceiver *_dataReceiver = nullptr;
     QVector<double> _values = QVector<double>(_displayingPointsCount, 0);
     QVector<double> _keys = QVector<double>(_displayingPointsCount);
