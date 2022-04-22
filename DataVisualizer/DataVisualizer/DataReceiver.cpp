@@ -48,3 +48,12 @@ void DataReceiver::setFunction(quint8 funcIndex)
             << funcIndex;
     _receiver->writeDatagram(data, _serverAddress, _serverPort);
 }
+
+void DataReceiver::setStep(double step)
+{
+    QByteArray data;
+    QDataStream command(&data, QIODevice::WriteOnly);
+    command << static_cast<quint8>(Commands::SetStep)
+            << step;
+    _receiver->writeDatagram(data, _serverAddress, _serverPort);
+}

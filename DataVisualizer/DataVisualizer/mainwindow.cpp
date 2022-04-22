@@ -16,8 +16,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     fillComboBoxFunctions();
 
-    connect(ui->sbRange, &QSpinBox::valueChanged, this, &MainWindow::changeRange);
-
     ui->dataDisplay->addGraph();
     fillRangeWithStep(_keys.begin(), _keys.end(), 0.0, _keyStep);
     ui->dataDisplay->graph()->setData(_keys, _values);
@@ -69,6 +67,7 @@ void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
             _values.resize(_displayingPointsCount);
             _dataReceiver->setServerPort(_serverPort);
             _dataReceiver->setFunction(ui->cbFunction->currentData().toInt());
+            _dataReceiver->setStep(ui->sbStep->value());
 
             // If data left, then it's already received data generated for displaying
             receiveData(in.device()->readAll());
@@ -104,22 +103,6 @@ void MainWindow::receiveData(const QByteArray &bytes)
     ui->dataDisplay->graph(0)->setData(_keys, _values);
     ui->dataDisplay->graph(0)->rescaleAxes();
     ui->dataDisplay->replot();
-}
-
-void MainWindow::changeRange(int value)
-{
-    if (value > _displayingPointsCount) {
-        int count = value - _displayingPointsCount;
-        _keys.insert(0, count, 0);
-        fillRangeWithStep(_keys.rend() - count, _keys.rend(),
-                          *(_keys.rend() - count - 1) - _keyStep, -_keyStep);
-        _values.insert(0, count, 0);
-    } else if (value < _displayingPointsCount) {
-        int count = _displayingPointsCount - value;
-        _keys.remove(0, count);
-        _values.remove(0, count);
-    }
-    _displayingPointsCount = value;
 }
 
 void MainWindow::on_actChangePort_triggered()
@@ -159,5 +142,28 @@ void MainWindow::fillComboBoxFunctions()
     ui->cbFunction->addItem("Случайные данные", static_cast<int>(DataReceiver::Random));
     ui->cbFunction->addItem("Синус", static_cast<int>(DataReceiver::Sin));
     ui->cbFunction->addItem("Косинус", static_cast<int>(DataReceiver::Cos));
+}
+
+void MainWindow::on_sbStep_valueChanged(double value)
+{
+    if (_dataReceiver == nullptr)
+        return;
+    _dataReceiver->setStep(value);
+}
+
+void MainWindow::on_sbRange_valueChanged(int value)
+{
+    if (value > _displayingPointsCount) {
+        int count = value - _displayingPointsCount;
+        _keys.insert(0, count, 0);
+        fillRangeWithStep(_keys.rend() - count, _keys.rend(),
+                          *(_keys.rend() - count - 1) - _keyStep, -_keyStep);
+        _values.insert(0, count, 0);
+    } else if (value < _displayingPointsCount) {
+        int count = _displayingPointsCount - value;
+        _keys.remove(0, count);
+        _values.remove(0, count);
+    }
+    _displayingPointsCount = value;
 }
 

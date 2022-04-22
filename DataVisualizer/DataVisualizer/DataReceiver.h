@@ -22,6 +22,8 @@ public:
 
     void setFunction(quint8 funcIndex);
 
+    void setStep(double step);
+
     void quit();
 
     enum class Commands

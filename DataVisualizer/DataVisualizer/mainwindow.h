@@ -27,9 +27,12 @@ private slots:
     void connectToServer(const QHostAddress &host, quint16 port);
     void changePort(quint16 port);
     void receiveData(const QByteArray &byteArray);
-    void changeRange(int value);
 
     void on_cbFunction_currentIndexChanged(int index);
+
+    void on_sbStep_valueChanged(double value);
+
+    void on_sbRange_valueChanged(int value);
 
 private:
 
