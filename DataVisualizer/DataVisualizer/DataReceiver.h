@@ -26,6 +26,8 @@ public:
 
     void setDistribution(quint8 distrIndex);
 
+    void setNoiseProbability(double probability);
+
     void quit();
 
     enum class Commands
@@ -35,6 +37,7 @@ public:
         SetStep,
         NoOperation,
         SetDistribution,
+        SetProbability,
     };
 
     enum Functions

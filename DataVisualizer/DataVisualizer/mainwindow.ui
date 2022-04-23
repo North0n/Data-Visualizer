@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>DataVisualizer</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -109,6 +109,9 @@
         <property name="minimum">
          <double>0.000100000000000</double>
         </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
         <property name="value">
          <double>0.000100000000000</double>
         </property>
@@ -172,6 +175,9 @@
         <property name="maximum">
          <number>20000</number>
         </property>
+        <property name="singleStep">
+         <number>100</number>
+        </property>
        </widget>
       </item>
       <item>
@@ -209,13 +215,14 @@
     </property>
     <addaction name="actConnect"/>
     <addaction name="actDisconnect"/>
+    <addaction name="actChangePort"/>
    </widget>
    <widget class="QMenu" name="mSettings">
     <property name="title">
      <string>Настройки</string>
     </property>
-    <addaction name="actChangePort"/>
     <addaction name="actScaling"/>
+    <addaction name="actNoiseProbability"/>
    </widget>
    <addaction name="mNetwork"/>
    <addaction name="mSettings"/>
@@ -247,6 +254,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+M</string>
+   </property>
+  </action>
+  <action name="actNoiseProbability">
+   <property name="text">
+    <string>Шум</string>
    </property>
   </action>
  </widget>

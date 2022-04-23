@@ -67,3 +67,12 @@ void DataReceiver::setDistribution(quint8 distrIndex)
             << distrIndex;
     _receiver->writeDatagram(data, _serverAddress, _serverPort);
 }
+
+void DataReceiver::setNoiseProbability(double probability)
+{
+    QByteArray data;
+    QDataStream command(&data, QIODevice::WriteOnly);
+    command << static_cast<quint8>(Commands::SetProbability)
+            << probability;
+    _receiver->writeDatagram(data, _serverAddress, _serverPort);
+}

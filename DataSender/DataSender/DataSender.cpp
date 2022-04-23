@@ -60,6 +60,11 @@ void DataSender::read()
             in >> distrIndex;
             _generator.setDistribution(distrIndex);
             break;
+        case static_cast<quint8>(Commands::SetProbability):
+            double probability;
+            in >> probability;
+            _generator.setNoiseProbability(probability);
+            break;
         case static_cast<quint8>(Commands::NoOperation):
             break;
     }

@@ -8,6 +8,7 @@
 #include "formchangeport.h"
 #include <QTimer>
 #include "formscaling.h"
+#include "formnoiseprobability.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -44,6 +45,8 @@ private slots:
 
     void on_cbDistribution_currentIndexChanged(int index);
 
+    void on_actNoiseProbability_triggered();
+
 private:
 
     void fillComboBoxFunctions();
@@ -66,6 +69,9 @@ private:
     FormScaling::Scaling _scalingType = FormScaling::Auto;
     std::function<void()> _axisScaler;
     quint16 _displayingPointsCount = 400;
+
+    FormNoiseProbability *_formProbability = nullptr;
+    double _noiseProbability = 0.01;
 
     DataReceiver *_dataReceiver = nullptr;
     QVector<double> _values = QVector<double>(_displayingPointsCount, 0);

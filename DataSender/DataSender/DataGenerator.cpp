@@ -30,13 +30,10 @@ QByteArray DataGenerator::sin(quint16 length)
     QVector<double> values(length);
     for (auto &value : values) {
         value = std::sin(x);
-        // TODO было бы всё-таки хорошо добавить возможность управлять вероятностью шума
         value += static_cast<int>(noiseDistribution(generator) + _noiseProbability)
                 * _distributions[_currentDistribution]();
-//        value += normalDistribution(generator);
         x += _step;
         x -= static_cast<int>(x / period) * period;
-//        qDebug() << x << " " << value;
     }
     return QByteArray(reinterpret_cast<char*>(values.data()), length * sizeof(double));
 }
@@ -48,7 +45,8 @@ QByteArray DataGenerator::cos(quint16 length)
     QVector<double> values(length);
     for (auto &value : values) {
         value = std::cos(x);
-        value += _distributions[_currentDistribution]();
+        value += static_cast<int>(noiseDistribution(generator) + _noiseProbability)
+                 * _distributions[_currentDistribution]();
         x += _step;
         x -= static_cast<int>(x / period) * period;
     }
@@ -78,11 +76,12 @@ void DataGenerator::setDistribution(int index)
     _currentDistribution = index;
 }
 
-DataGenerator::DataGenerator(int funcIndex, double step)
-    : _currentFunc(funcIndex), _step(step)
-{}
-
 void DataGenerator::setStep(double step)
 {
     _step = step;
+}
+
+void DataGenerator::setNoiseProbability(double probability)
+{
+    _noiseProbability = probability;
 }

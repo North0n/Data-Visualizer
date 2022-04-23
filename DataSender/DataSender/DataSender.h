@@ -33,6 +33,7 @@ public:
         SetStep,
         NoOperation,
         SetDistribution,
+        SetProbability,
     };
 
 signals:

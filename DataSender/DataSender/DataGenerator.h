@@ -9,8 +9,6 @@
 class DataGenerator
 {
 public:
-
-    DataGenerator(int funcIndex = 0, double step = 0.1);
     /**
      * Generates a sequence of random double values of length @b length
      */
@@ -29,6 +27,8 @@ public:
     void setDistribution(int index);
 
     void setStep(double step);
+
+    void setNoiseProbability(double probability);
 
 private:
 
@@ -55,7 +55,7 @@ private:
     std::mt19937 generator;
     std::uniform_real_distribution<> noiseDistribution{0, 1};
     std::uniform_real_distribution<> uniformDistribution{-0.1, 0.1};
-    std::normal_distribution<> normalDistribution{0, 0.2};
+    std::normal_distribution<> normalDistribution{0, 0.1};
 };
 
 

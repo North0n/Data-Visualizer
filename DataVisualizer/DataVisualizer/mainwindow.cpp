@@ -64,14 +64,20 @@ void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
             QDataStream in(bytes);
             in >> _serverPort
                >> _serverMaxDowntime
-               >> _displayingPointsCount;
+               >> _displayingPointsCount; // Amount of points generated in one datagram
+
+            // DataVisualizer setup
             ui->sbRange->setMinimum(_displayingPointsCount);
             _keys.resize(_displayingPointsCount);
             fillRangeWithStep(_keys.begin(), _keys.end(), 0.0, _keyStep);
             _values.resize(_displayingPointsCount);
+
+            // Server setup depending on current DataVisualizer setup
             _dataReceiver->setServerPort(_serverPort);
             _dataReceiver->setFunction(ui->cbFunction->currentData().toInt());
             _dataReceiver->setStep(ui->sbStep->value());
+            _dataReceiver->setDistribution(ui->cbDistribution->currentData().toInt());
+            _dataReceiver->setNoiseProbability(_noiseProbability);
 
             // If data left, then it's already received data generated for displaying
             receiveData(in.device()->readAll());
@@ -107,7 +113,7 @@ void MainWindow::receiveData(const QByteArray &bytes)
 //                     [step = difference](auto &value){value += step;});
 
     ui->dataDisplay->graph(0)->setData(_keys, _values);
-    // TODO добавить возможность выбора автоматическое масштабирование или ручное
+
     _axisScaler();
     ui->dataDisplay->replot();
 }
@@ -220,5 +226,22 @@ void MainWindow::changeScalingType(FormScaling::Scaling type)
         _axisScaler = [this](){ui->dataDisplay->graph(0)->rescaleAxes(); };
     else
         _axisScaler = [this](){ui->dataDisplay->xAxis->rescale(); };
+}
+
+
+void MainWindow::on_actNoiseProbability_triggered()
+{
+    delete _formProbability;
+    _formProbability = new FormNoiseProbability(_noiseProbability, this);
+    connect(_formProbability, &FormNoiseProbability::probabilityReady,
+        [this](double value)
+        {
+            _noiseProbability = value;
+            if (_dataReceiver == nullptr)
+                return;
+            _dataReceiver->setNoiseProbability(_noiseProbability);
+        }
+    );
+    _formProbability->show();
 }
 
