@@ -66,7 +66,7 @@ void DataSender::sendConfiguration()
 
 void DataSender::startSending()
 {
-    QtConcurrent::run([this] { send(); });
+    _sending = QtConcurrent::run([this] { send(); });
 }
 
 void DataSender::send()
@@ -76,6 +76,7 @@ void DataSender::send()
         bytes = _generator.getData(_sequenceLength);
         _socket.writeDatagram(bytes, _clientAddress, _clientPort);
     }
+    qDebug() << "Ended";
 }
 
 void DataSender::checkConnection()
@@ -89,7 +90,7 @@ void DataSender::checkConnection()
 void DataSender::abortConnection()
 {
     _isConnected = false;
-    disconnect(&_timer, &QTimer::timeout, this, &DataSender::checkConnection);
+    _sending.waitForFinished();
     qDebug() << "Client disconnected";
     emit connectionAborted(ClientAddress(_clientAddress.toIPv4Address(), _clientPort));
 }

@@ -10,6 +10,7 @@
 #include <QTimer>
 #include <QByteArray>
 #include "DataGenerator.h"
+#include <QFuture>
 
 // QPair<quint32 , quint16> stands for a clients IPv4 address and port
 using ClientAddress = QPair<quint32, quint16>;
@@ -59,6 +60,7 @@ private:
     bool _hadClientSignal = true;
 
     bool _isConnected = true;
+    QFuture<void> _sending;
 };
 
 

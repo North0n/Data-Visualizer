@@ -23,6 +23,7 @@ QByteArray DataGenerator::sin(quint16 length) const
         value = std::sin(x);
         x += _step;
         x -= static_cast<int>(x / period) * period;
+//        qDebug() << x << " " << value;
     }
     return QByteArray(reinterpret_cast<char*>(values.data()), length * sizeof(double));
 }
