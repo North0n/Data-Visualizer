@@ -32,6 +32,7 @@ public:
         Quit,
         SetStep,
         NoOperation,
+        SetDistribution,
     };
 
 signals:

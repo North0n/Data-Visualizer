@@ -128,7 +128,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Распределение данных</string>
+         <string>Распределение шума</string>
         </property>
        </widget>
       </item>

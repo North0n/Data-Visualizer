@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     fillComboBoxFunctions();
+    fillComboBoxDistributions();
 
     ui->dataDisplay->addGraph();
     fillRangeWithStep(_keys.begin(), _keys.end(), 0.0, _keyStep);
@@ -143,11 +144,27 @@ void MainWindow::on_cbFunction_currentIndexChanged(int index)
     _dataReceiver->setFunction(ui->cbFunction->currentData().toInt());
 }
 
+void MainWindow::on_cbDistribution_currentIndexChanged(int index)
+{
+    if (_dataReceiver == nullptr)
+        return;
+    _dataReceiver->setDistribution(ui->cbDistribution->currentData().toInt());
+}
+
+
 void MainWindow::fillComboBoxFunctions()
 {
     ui->cbFunction->addItem("Случайные данные", static_cast<int>(DataReceiver::Random));
+    ui->cbFunction->addItem("Прямая", static_cast<int>(DataReceiver::Line));
     ui->cbFunction->addItem("Синус", static_cast<int>(DataReceiver::Sin));
     ui->cbFunction->addItem("Косинус", static_cast<int>(DataReceiver::Cos));
+}
+
+void MainWindow::fillComboBoxDistributions()
+{
+    ui->cbDistribution->addItem("Без шума", static_cast<int>(DataReceiver::NoDistribution));
+    ui->cbDistribution->addItem("Равномерное", static_cast<int>(DataReceiver::Uniform));
+    ui->cbDistribution->addItem("Нормальное", static_cast<int>(DataReceiver::Normal));
 }
 
 void MainWindow::on_sbStep_valueChanged(double value)

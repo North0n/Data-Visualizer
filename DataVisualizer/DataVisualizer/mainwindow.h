@@ -42,9 +42,12 @@ private slots:
 
     void on_actScaling_triggered();
 
+    void on_cbDistribution_currentIndexChanged(int index);
+
 private:
 
     void fillComboBoxFunctions();
+    void fillComboBoxDistributions();
 
     static quint16 _port;
     double _keyStep = 1;

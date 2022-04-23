@@ -31,6 +31,7 @@ void FormScaling::setManual(bool manual)
     ui->leYMin->setEnabled(manual);
     ui->leYMax->setEnabled(manual);
 }
+
 void FormScaling::on_rbAuto_toggled(bool checked)
 {
     // Auto-scaling selected
@@ -41,6 +42,8 @@ void FormScaling::on_rbAuto_toggled(bool checked)
     else {
         setManual(true);
         emit scalingTypeChanged(Manual);
+        emit yMinChanged(ui->leYMin->text().toDouble());
+        emit yMaxChanged(ui->leYMax->text().toDouble());
     }
 }
 

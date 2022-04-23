@@ -4,7 +4,7 @@
 #include <QDataStream>
 
 int DataSender::_maxDowntimeTime = 30000;
-quint16 DataSender::_sequenceLength = 64;
+quint16 DataSender::_sequenceLength = 4;
 
 DataSender::DataSender(quint16 port, const QHostAddress &host, quint16 clientPort, QObject *parent)
     : QObject(parent),
@@ -34,7 +34,13 @@ void DataSender::read()
     // Handles received command
     quint8 commandIndex;
     QDataStream in(&datagram, QIODevice::ReadOnly);
-    in >> commandIndex;
+
+    // TODO Добавил эти 4 строчки с мыслью вдруг из-за них крашиться начало
+    if (in.device()->size() >= sizeof(quint8))
+        in >> commandIndex;
+    else
+        return;
+
     switch (commandIndex) {
         case static_cast<quint8>(Commands::SetFunc):
             quint8 funcIndex;
@@ -48,6 +54,11 @@ void DataSender::read()
             double step;
             in >> step;
             _generator.setStep(step);
+            break;
+        case static_cast<quint8>(Commands::SetDistribution):
+            quint8 distrIndex;
+            in >> distrIndex;
+            _generator.setDistribution(distrIndex);
             break;
         case static_cast<quint8>(Commands::NoOperation):
             break;
@@ -75,8 +86,9 @@ void DataSender::send()
     while (_isConnected) {
         bytes = _generator.getData(_sequenceLength);
         _socket.writeDatagram(bytes, _clientAddress, _clientPort);
+        // TODO пока не знаю как пофиксить некорректное отображение синуса и косинуса кроме того, как так
+        QThread::msleep(1);
     }
-    qDebug() << "Ended";
 }
 
 void DataSender::checkConnection()
@@ -91,6 +103,5 @@ void DataSender::abortConnection()
 {
     _isConnected = false;
     _sending.waitForFinished();
-    qDebug() << "Client disconnected";
     emit connectionAborted(ClientAddress(_clientAddress.toIPv4Address(), _clientPort));
 }

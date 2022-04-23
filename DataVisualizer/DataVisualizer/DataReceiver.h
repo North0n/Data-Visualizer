@@ -24,6 +24,8 @@ public:
 
     void setStep(double step);
 
+    void setDistribution(quint8 distrIndex);
+
     void quit();
 
     enum class Commands
@@ -32,13 +34,22 @@ public:
         Quit,
         SetStep,
         NoOperation,
+        SetDistribution,
     };
 
     enum Functions
     {
         Random = 0,
+        Line,
         Sin,
         Cos,
+    };
+
+    enum Distributions
+    {
+        NoDistribution,
+        Uniform,
+        Normal,
     };
 
 signals:
