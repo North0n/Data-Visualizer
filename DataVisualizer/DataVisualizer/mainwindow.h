@@ -7,6 +7,7 @@
 #include "connection.h"
 #include "formchangeport.h"
 #include <QTimer>
+#include "formscaling.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,12 +22,17 @@ public:
     ~MainWindow() override;
 
 private slots:
-    void on_actConnect_triggered();
-    void on_actDisconnect_triggered();
-    void on_actChangePort_triggered();
+
     void connectToServer(const QHostAddress &host, quint16 port);
     void changePort(quint16 port);
     void receiveData(const QByteArray &byteArray);
+    void changeScalingType(FormScaling::Scaling type);
+
+    void on_actConnect_triggered();
+
+    void on_actDisconnect_triggered();
+
+    void on_actChangePort_triggered();
 
     void on_cbFunction_currentIndexChanged(int index);
 
@@ -34,12 +40,13 @@ private slots:
 
     void on_sbRange_valueChanged(int value);
 
+    void on_actScaling_triggered();
+
 private:
 
     void fillComboBoxFunctions();
 
     static quint16 _port;
-    quint16 _displayingPointsCount = 400;
     double _keyStep = 1;
 
     Ui::MainWindow *ui;
@@ -51,6 +58,11 @@ private:
 
     FormConnection *_formConnection = nullptr;
     FormChangePort *_formChangePort = nullptr;
+    FormScaling *_formScaling = nullptr;
+
+    FormScaling::Scaling _scalingType = FormScaling::Auto;
+    std::function<void()> _axisScaler;
+    quint16 _displayingPointsCount = 400;
 
     DataReceiver *_dataReceiver = nullptr;
     QVector<double> _values = QVector<double>(_displayingPointsCount, 0);

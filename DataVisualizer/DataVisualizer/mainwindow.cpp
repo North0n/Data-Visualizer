@@ -20,7 +20,8 @@ MainWindow::MainWindow(QWidget *parent)
     fillRangeWithStep(_keys.begin(), _keys.end(), 0.0, _keyStep);
     ui->dataDisplay->graph(0)->setData(_keys, _values);
     ui->dataDisplay->xAxis->setTickLabels(false);
-    ui->dataDisplay->graph(0)->rescaleAxes();
+    _axisScaler = [this](){ui->dataDisplay->graph(0)->rescaleAxes(); };
+    _axisScaler();
 }
 
 MainWindow::~MainWindow()
@@ -106,7 +107,7 @@ void MainWindow::receiveData(const QByteArray &bytes)
 
     ui->dataDisplay->graph(0)->setData(_keys, _values);
     // TODO добавить возможность выбора автоматическое масштабирование или ручное
-    ui->dataDisplay->graph(0)->rescaleAxes();
+    _axisScaler();
     ui->dataDisplay->replot();
 }
 
@@ -170,5 +171,37 @@ void MainWindow::on_sbRange_valueChanged(int value)
         _values.remove(0, count);
     }
     _displayingPointsCount = value;
+}
+
+
+void MainWindow::on_actScaling_triggered()
+{
+    delete _formScaling;
+    _formScaling = new FormScaling(_scalingType, _displayingPointsCount,
+                                   ui->dataDisplay->yAxis->range().lower, ui->dataDisplay->yAxis->range().upper,
+                                   this);
+    connect(_formScaling, &FormScaling::scalingTypeChanged, this, &MainWindow::changeScalingType);
+    connect(_formScaling, &FormScaling::yMinChanged,
+        [this](double value)
+        {
+            ui->dataDisplay->yAxis->setRange(value, ui->dataDisplay->yAxis->range().upper);
+        }
+    );
+    connect(_formScaling, &FormScaling::yMaxChanged,
+        [this](double value)
+        {
+            ui->dataDisplay->yAxis->setRange(ui->dataDisplay->yAxis->range().lower, value);
+        }
+    );
+    _formScaling->show();
+}
+
+void MainWindow::changeScalingType(FormScaling::Scaling type)
+{
+    _scalingType = type;
+    if (type == FormScaling::Auto)
+        _axisScaler = [this](){ui->dataDisplay->graph(0)->rescaleAxes(); };
+    else
+        _axisScaler = [this](){ui->dataDisplay->xAxis->rescale(); };
 }
 

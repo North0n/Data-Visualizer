@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
      <widget class="QCustomPlot" name="dataDisplay" native="true">
       <property name="sizePolicy">
@@ -175,6 +175,9 @@
        </widget>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="horizontalLayout"/>
+      </item>
+      <item>
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -212,6 +215,7 @@
      <string>Настройки</string>
     </property>
     <addaction name="actChangePort"/>
+    <addaction name="actScaling"/>
    </widget>
    <addaction name="mNetwork"/>
    <addaction name="mSettings"/>
@@ -235,6 +239,14 @@
   <action name="actDisconnect">
    <property name="text">
     <string>Отключиться</string>
+   </property>
+  </action>
+  <action name="actScaling">
+   <property name="text">
+    <string>Масштабирование</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
    </property>
   </action>
  </widget>
