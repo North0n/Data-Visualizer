@@ -71,7 +71,7 @@ private:
     quint16 _displayingPointsCount = 400;
 
     FormNoiseProbability *_formProbability = nullptr;
-    double _noiseProbability = 0.01;
+    double _noiseProbability = 0.50;
 
     DataReceiver *_dataReceiver = nullptr;
     QVector<double> _values = QVector<double>(_displayingPointsCount, 0);

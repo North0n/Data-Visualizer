@@ -67,10 +67,14 @@ void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
                >> _displayingPointsCount; // Amount of points generated in one datagram
 
             // DataVisualizer setup
+            if (ui->sbRange->value() < _displayingPointsCount) {
+                _keys.resize(_displayingPointsCount);
+                fillRangeWithStep(_keys.begin(), _keys.end(), 0.0, _keyStep);
+                _values.resize(_displayingPointsCount);
+            } else {
+                _displayingPointsCount = ui->sbRange->value();
+            }
             ui->sbRange->setMinimum(_displayingPointsCount);
-            _keys.resize(_displayingPointsCount);
-            fillRangeWithStep(_keys.begin(), _keys.end(), 0.0, _keyStep);
-            _values.resize(_displayingPointsCount);
 
             // Server setup depending on current DataVisualizer setup
             _dataReceiver->setServerPort(_serverPort);
@@ -182,6 +186,7 @@ void MainWindow::on_sbStep_valueChanged(double value)
 
 void MainWindow::on_sbRange_valueChanged(int value)
 {
+    // TODO если я не подписываю ось X, тогда зачем тут _keyStep и вообще можно упростить
     if (value > _displayingPointsCount) {
         int count = value - _displayingPointsCount;
         _keys.insert(0, count, 0);
