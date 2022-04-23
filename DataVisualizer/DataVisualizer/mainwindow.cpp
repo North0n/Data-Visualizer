@@ -18,7 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->dataDisplay->addGraph();
     fillRangeWithStep(_keys.begin(), _keys.end(), 0.0, _keyStep);
-    ui->dataDisplay->graph()->setData(_keys, _values);
+    ui->dataDisplay->graph(0)->setData(_keys, _values);
+    ui->dataDisplay->xAxis->setTickLabels(false);
     ui->dataDisplay->graph(0)->rescaleAxes();
 }
 
@@ -64,6 +65,7 @@ void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
                >> _displayingPointsCount;
             ui->sbRange->setMinimum(_displayingPointsCount);
             _keys.resize(_displayingPointsCount);
+            fillRangeWithStep(_keys.begin(), _keys.end(), 0.0, _keyStep);
             _values.resize(_displayingPointsCount);
             _dataReceiver->setServerPort(_serverPort);
             _dataReceiver->setFunction(ui->cbFunction->currentData().toInt());
@@ -93,14 +95,17 @@ void MainWindow::receiveData(const QByteArray &bytes)
     _values.remove(0, datagramSize);
     _values.append(QVector<double>(reinterpret_cast<const double*>(bytes.begin()),
                                         reinterpret_cast<const double*>(bytes.end())));
+//    qDebug() << QVector<double>(reinterpret_cast<const double*>(bytes.begin()),
+//                                reinterpret_cast<const double*>(bytes.end()));
 
     // TODO по-хорошему подобные вычисления вынести из этого метода в поле и его изменять при изменении значений спинбоксов
-    double difference = _displayingPointsCount * _keyStep;
-    std::rotate(_keys.begin(), _keys.begin() + datagramSize, _keys.end());
-    std::for_each(_keys.begin() + (_keys.size() - datagramSize), _keys.end(),
-                     [step = difference](auto &value){value += step;});
+//    double difference = _displayingPointsCount * _keyStep;
+//    std::rotate(_keys.begin(), _keys.begin() + datagramSize, _keys.end());
+//    std::for_each(_keys.begin() + (_keys.size() - datagramSize), _keys.end(),
+//                     [step = difference](auto &value){value += step;});
 
     ui->dataDisplay->graph(0)->setData(_keys, _values);
+    // TODO добавить возможность выбора автоматическое масштабирование или ручное
     ui->dataDisplay->graph(0)->rescaleAxes();
     ui->dataDisplay->replot();
 }
