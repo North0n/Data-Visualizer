@@ -13,16 +13,15 @@ FormConnection::FormConnection(QWidget *parent) :
     setModal(true);
 
     ui->setupUi(this);
-//    setupStylesheet();
 
-    _portValidator = new QIntValidator(0, UINT16_MAX, this);
-    ui->lePort->setValidator(_portValidator);
+    _portValidator =  std::make_unique<QIntValidator>(0, UINT16_MAX, this);
+    ui->lePort->setValidator(_portValidator.get());
 
     // Regular expression for valid IPv4 address
     // TODO: https://doc.qt.io/qt-5/qlineedit.html#inputMask-prop use mask instead of regexp
     QRegularExpression regExp(R"(^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$)");
-    _ipValidator = new QRegularExpressionValidator(regExp, this);
-    ui->leIp->setValidator(_ipValidator);
+    _ipValidator = std::make_unique<QRegularExpressionValidator>(regExp, this);
+    ui->leIp->setValidator(_ipValidator.get());
 }
 
 FormConnection::~FormConnection()

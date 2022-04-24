@@ -4,6 +4,9 @@
 #include <QVector>
 #include <cmath>
 #include "qdebug.h"
+#include <QDataStream>
+#include <QByteArray>
+#include <QIODevice>
 
 QByteArray DataGenerator::random(quint16 length)
 {

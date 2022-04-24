@@ -91,8 +91,7 @@ void DataSender::send()
     while (_isConnected) {
         bytes = _generator.getData(_sequenceLength);
         _socket.writeDatagram(bytes, _clientAddress, _clientPort);
-        // TODO пока не знаю как пофиксить некорректное отображение синуса и косинуса кроме того, как так
-        QThread::msleep(1);
+        QThread::usleep(1);
     }
 }
 

@@ -7,9 +7,9 @@ DataReceiver::DataReceiver(quint16 port, const QHostAddress &serverAddress, quin
                            _serverAddress(serverAddress),
                            _serverPort(serverPort)
 {
-    _receiver = new QUdpSocket(this);
+    _receiver = std::make_unique<QUdpSocket>( this);
     _receiver->bind(QHostAddress::Any, _port);
-    connect(_receiver, &QUdpSocket::readyRead, this, &DataReceiver::getData);
+    connect(_receiver.get(), &QUdpSocket::readyRead, this, &DataReceiver::getData);
 }
 
 void DataReceiver::getData()

@@ -11,8 +11,8 @@ FormChangePort::FormChangePort(quint16 currentPort, QWidget *parent) :
 
     ui->setupUi(this);
 
-    _portValidator = new QIntValidator(0, UINT16_MAX, this);
-    ui->lePort->setValidator(_portValidator);
+    _portValidator = std::make_unique<QIntValidator>(0, UINT16_MAX, this);
+    ui->lePort->setValidator(_portValidator.get());
     ui->lePort->setText(QString::number(currentPort));
 }
 

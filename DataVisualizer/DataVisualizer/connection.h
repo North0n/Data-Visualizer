@@ -5,6 +5,7 @@
 #include <QString>
 #include <QValidator>
 #include <QHostAddress>
+#include <memory>
 
 namespace Ui {
 class Connection;
@@ -31,8 +32,8 @@ private:
     void setupStylesheet();
 
     Ui::Connection *ui;
-    QValidator *_ipValidator;
-    QValidator *_portValidator;
+    std::unique_ptr<QValidator> _ipValidator;
+    std::unique_ptr<QValidator> _portValidator;
 };
 
 #endif // CONNECTION_H

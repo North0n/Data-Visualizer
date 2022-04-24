@@ -36,29 +36,27 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actConnect_triggered()
 {
-    delete _formConnection;
-    _formConnection = new FormConnection(this);
-    connect(_formConnection, &FormConnection::onConnectPressed, this, &MainWindow::connectToServer);
+    _formConnection = std::make_unique<FormConnection>(this);
+    connect(_formConnection.get(), &FormConnection::onConnectPressed, this, &MainWindow::connectToServer);
     _formConnection->show();
 }
 
 void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
 {
-    if (&host != _serverAddress) {
-        delete _serverAddress;
-        _serverAddress = new QHostAddress(host);
+    if (&host != _serverAddress.get()) {
+        _serverAddress = std::make_unique<QHostAddress>(host);
     }
     _serverPort = port;
 
-    delete _dataReceiver;
-    _dataReceiver = new DataReceiver(_port, *_serverAddress, _serverPort, this);
+    _dataReceiver = std::make_unique<DataReceiver>(_port, *_serverAddress,
+                                                   _serverPort, this);
 
     // Send echo request to server to get his configuration
     _dataReceiver->refreshConnection();
 
     // Receive configuration information about server
     auto * const connection = new QMetaObject::Connection;
-    *connection = connect(_dataReceiver, &DataReceiver::dataReceived,
+    *connection = connect(_dataReceiver.get(), &DataReceiver::dataReceived,
         [this, connection](const QByteArray &bytes)
         {
             // Setting server configuration
@@ -98,13 +96,12 @@ void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
             // Handle all the other received data using receiveData method
             QObject::disconnect(*connection);
             delete connection;
-            connect(_dataReceiver, &DataReceiver::dataReceived, this, &MainWindow::receiveData);
+            connect(_dataReceiver.get(), &DataReceiver::dataReceived, this, &MainWindow::receiveData);
 
             // Timer for telling server that this client is still alive and server should refreshConnection data
-            delete _refreshConnectionTimer;
-            _refreshConnectionTimer = new QTimer(this);
-            connect(_refreshConnectionTimer, &QTimer::timeout,
-                    _dataReceiver, &DataReceiver::refreshConnection);
+            _refreshConnectionTimer = std::make_unique<QTimer>(this);
+            connect(_refreshConnectionTimer.get(), &QTimer::timeout,
+                    _dataReceiver.get(), &DataReceiver::refreshConnection);
             _refreshConnectionTimer->start(_serverMaxDowntime / 2);
         }
     );
@@ -135,9 +132,8 @@ void MainWindow::receiveData(const QByteArray &bytes)
 
 void MainWindow::on_actChangePort_triggered()
 {
-    delete _formChangePort;
-    _formChangePort = new FormChangePort(_port, this);
-    connect(_formChangePort, &FormChangePort::onSavePressed, this, &MainWindow::changePort);
+    _formChangePort = std::make_unique<FormChangePort>(_port, this);
+    connect(_formChangePort.get(), &FormChangePort::onSavePressed, this, &MainWindow::changePort);
     _formChangePort->show();
 }
 
@@ -146,15 +142,13 @@ void MainWindow::changePort(quint16 port)
     if (port == _port)
         return;
     _port = port;
-    delete _dataReceiver;
-    _dataReceiver = nullptr;
+    _dataReceiver.reset(nullptr);
 }
 
 
 void MainWindow::on_actDisconnect_triggered()
 {
-    delete _dataReceiver;
-    _dataReceiver = nullptr;
+    _dataReceiver.reset(nullptr);
 }
 
 
@@ -214,18 +208,17 @@ void MainWindow::on_sbRange_valueChanged(int value)
 
 void MainWindow::on_actScaling_triggered()
 {
-    delete _formScaling;
-    _formScaling = new FormScaling(_scalingType, _displayingPointsCount,
-                                   ui->dataDisplay->yAxis->range().lower, ui->dataDisplay->yAxis->range().upper,
-                                   this);
-    connect(_formScaling, &FormScaling::scalingTypeChanged, this, &MainWindow::changeScalingType);
-    connect(_formScaling, &FormScaling::yMinChanged,
+    _formScaling = std::make_unique<FormScaling>(_scalingType,
+                   _displayingPointsCount, ui->dataDisplay->yAxis->range().lower,
+                   ui->dataDisplay->yAxis->range().upper, this);
+    connect(_formScaling.get(), &FormScaling::scalingTypeChanged, this, &MainWindow::changeScalingType);
+    connect(_formScaling.get(), &FormScaling::yMinChanged,
         [this](double value)
         {
             ui->dataDisplay->yAxis->setRange(value, ui->dataDisplay->yAxis->range().upper);
         }
     );
-    connect(_formScaling, &FormScaling::yMaxChanged,
+    connect(_formScaling.get(), &FormScaling::yMaxChanged,
         [this](double value)
         {
             ui->dataDisplay->yAxis->setRange(ui->dataDisplay->yAxis->range().lower, value);
@@ -246,9 +239,8 @@ void MainWindow::changeScalingType(FormScaling::Scaling type)
 
 void MainWindow::on_actNoiseProbability_triggered()
 {
-    delete _formProbability;
-    _formProbability = new FormNoiseProbability(_noiseProbability, this);
-    connect(_formProbability, &FormNoiseProbability::probabilityReady,
+    _formProbability = std::make_unique<FormNoiseProbability>(_noiseProbability, this);
+    connect(_formProbability.get(), &FormNoiseProbability::probabilityReady,
         [this](double value)
         {
             _noiseProbability = value;

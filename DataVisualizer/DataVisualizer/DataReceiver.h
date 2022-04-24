@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QUdpSocket>
 #include <QByteArray>
-#include <QPointer>
+#include <memory>
 
 class DataReceiver : public QObject
 {
@@ -62,12 +62,13 @@ private:
 
     void getData();
 
+    // TODO мб можно переделать используя функцию connectToHost() абстрактного сокета
     QHostAddress _serverAddress;
     quint16 _serverPort;
 
     // Port which receiver "listens" to
     quint16 _port;
-    QPointer<QUdpSocket> _receiver;
+    std::unique_ptr<QUdpSocket> _receiver;
 };
 
 

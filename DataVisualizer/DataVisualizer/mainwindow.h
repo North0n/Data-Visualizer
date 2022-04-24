@@ -61,22 +61,22 @@ private:
     Ui::MainWindow *ui;
 
     qint32 _serverMaxDowntime;
-    QHostAddress *_serverAddress = nullptr;
+    std::unique_ptr<QHostAddress> _serverAddress;
     quint16 _serverPort;
-    QTimer *_refreshConnectionTimer = nullptr;
+    std::unique_ptr<QTimer> _refreshConnectionTimer;
 
-    FormConnection *_formConnection = nullptr;
-    FormChangePort *_formChangePort = nullptr;
-    FormScaling *_formScaling = nullptr;
+    std::unique_ptr<FormConnection> _formConnection;
+    std::unique_ptr<FormChangePort> _formChangePort;
+    std::unique_ptr<FormScaling> _formScaling;
 
     FormScaling::Scaling _scalingType = FormScaling::Auto;
     std::function<void()> _axisScaler;
     quint16 _displayingPointsCount = 400;
 
-    FormNoiseProbability *_formProbability = nullptr;
+    std::unique_ptr<FormNoiseProbability> _formProbability;
     double _noiseProbability = 0.50;
 
-    DataReceiver *_dataReceiver = nullptr;
+    std::unique_ptr<DataReceiver> _dataReceiver;
     QSharedPointer<QCPGraphDataContainer> _graphData;
     QVector<double> _values = QVector<double>(_displayingPointsCount, 0);
     QVector<double> _keys = QVector<double>(_displayingPointsCount);

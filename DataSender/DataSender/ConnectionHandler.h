@@ -25,7 +25,6 @@ private slots:
 private:
     quint16 _port;
     QUdpSocket _receiver;
-//    DataSender *_dataSender = nullptr;
     quint16 _nextDataSenderPort = 30000;
     QMap<ClientAddress, DataSender*> _connectedClients;
 };

@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QValidator>
+#include <memory>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -30,7 +31,7 @@ private slots:
 
 private:
     Ui::FormChangePort *ui;
-    QValidator *_portValidator;
+    std::unique_ptr<QValidator> _portValidator;
 };
 
 
