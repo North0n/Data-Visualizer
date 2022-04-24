@@ -60,7 +60,6 @@ void DataReceiver::setStep(double step)
 
 void DataReceiver::setDistribution(quint8 distrIndex)
 {
-    // TODO неплохо бы как-то эти однотипные отправления функций вынести в одну
     QByteArray data;
     QDataStream command(&data, QIODevice::WriteOnly);
     command << static_cast<quint8>(Commands::SetDistribution)

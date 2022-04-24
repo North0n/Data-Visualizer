@@ -27,7 +27,6 @@ private slots:
 private:
     quint16 _port;
     QUdpSocket _receiver;
-    quint16 _nextDataSenderPort = 30000;
     std::priority_queue<quint16, std::vector<quint16>, std::greater<>> _availablePorts;
     QMap<ClientAddress, DataSender*> _connectedClients;
 };

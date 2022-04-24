@@ -5,8 +5,6 @@
 #include <algorithm>
 #include <QDataStream>
 
-quint16 MainWindow::_port = 20001;
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -33,22 +31,15 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_actConnect_triggered()
-{
-    _formConnection = std::make_unique<FormConnection>(this);
-    connect(_formConnection.get(), &FormConnection::onConnectPressed, this, &MainWindow::connectToServer);
-    _formConnection->show();
-}
-
 void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
 {
     if (&host != _serverAddress.get()) {
         _serverAddress = std::make_unique<QHostAddress>(host);
     }
-    _serverPort = port;
+    quint16 serverPort = port;
 
     _dataReceiver = std::make_unique<DataReceiver>(_port, *_serverAddress,
-                                                   _serverPort, this);
+                                                   serverPort, this);
 
     // Send echo request to server to get his configuration
     _dataReceiver->refreshConnection();
@@ -62,9 +53,11 @@ void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
             // Port is changed, because first port is a port of a whole server,
             // which gives for this particular client a single thread to carry out its queries.
             // So new port refers to this particular thread
+            qint32 serverMaxDowntime;
+            quint16 serverPort;
             QDataStream in(bytes);
-            in >> _serverPort
-               >> _serverMaxDowntime
+            in >> serverPort
+               >> serverMaxDowntime
                >> _displayingPointsCount; // Amount of points generated in one datagram
 
             // Setting up minimum range, so it couldn't be less than size of one packet,
@@ -83,7 +76,7 @@ void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
             }
 
             // Server setup depending on current DataVisualizer setup
-            _dataReceiver->setServerPort(_serverPort);
+            _dataReceiver->setServerPort(serverPort);
             _dataReceiver->setFunction(ui->cbFunction->currentData().toInt());
             _dataReceiver->setStep(ui->sbStep->value());
             _dataReceiver->setDistribution(ui->cbDistribution->currentData().toInt());
@@ -101,7 +94,7 @@ void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
             _refreshConnectionTimer = std::make_unique<QTimer>(this);
             connect(_refreshConnectionTimer.get(), &QTimer::timeout,
                     _dataReceiver.get(), &DataReceiver::refreshConnection);
-            _refreshConnectionTimer->start(_serverMaxDowntime / 2);
+            _refreshConnectionTimer->start(serverMaxDowntime / 2);
         }
     );
 }
@@ -129,65 +122,6 @@ void MainWindow::receiveData(const QByteArray &bytes)
     ui->dataDisplay->replot();
 }
 
-void MainWindow::on_actChangePort_triggered()
-{
-    _formChangePort = std::make_unique<FormChangePort>(_port, this);
-    connect(_formChangePort.get(), &FormChangePort::onSavePressed, this, &MainWindow::changePort);
-    _formChangePort->show();
-}
-
-void MainWindow::changePort(quint16 port)
-{
-    if (port == _port)
-        return;
-    _port = port;
-    _dataReceiver.reset(nullptr);
-}
-
-
-void MainWindow::on_actDisconnect_triggered()
-{
-    _dataReceiver.reset(nullptr);
-}
-
-
-void MainWindow::on_cbFunction_currentIndexChanged(int index)
-{
-    if (_dataReceiver == nullptr)
-        return;
-    _dataReceiver->setFunction(ui->cbFunction->currentData().toInt());
-}
-
-void MainWindow::on_cbDistribution_currentIndexChanged(int index)
-{
-    if (_dataReceiver == nullptr)
-        return;
-    _dataReceiver->setDistribution(ui->cbDistribution->currentData().toInt());
-}
-
-
-void MainWindow::fillComboBoxFunctions()
-{
-    ui->cbFunction->addItem("Случайные данные", static_cast<int>(DataReceiver::Random));
-    ui->cbFunction->addItem("Прямая", static_cast<int>(DataReceiver::Line));
-    ui->cbFunction->addItem("Синус", static_cast<int>(DataReceiver::Sin));
-    ui->cbFunction->addItem("Косинус", static_cast<int>(DataReceiver::Cos));
-}
-
-void MainWindow::fillComboBoxDistributions()
-{
-    ui->cbDistribution->addItem("Без шума", static_cast<int>(DataReceiver::NoDistribution));
-    ui->cbDistribution->addItem("Равномерное", static_cast<int>(DataReceiver::Uniform));
-    ui->cbDistribution->addItem("Нормальное", static_cast<int>(DataReceiver::Normal));
-}
-
-void MainWindow::on_sbStep_valueChanged(double value)
-{
-    if (_dataReceiver == nullptr)
-        return;
-    _dataReceiver->setStep(value);
-}
-
 void MainWindow::on_sbRange_valueChanged(int value)
 {
     if (value > _displayingPointsCount) {
@@ -204,24 +138,86 @@ void MainWindow::on_sbRange_valueChanged(int value)
     _displayingPointsCount = value;
 }
 
+void MainWindow::on_actConnect_triggered()
+{
+    _formConnection = std::make_unique<FormConnection>(this);
+    connect(_formConnection.get(), &FormConnection::onConnectPressed, this, &MainWindow::connectToServer);
+    _formConnection->show();
+}
+
+void MainWindow::on_actDisconnect_triggered()
+{
+    _dataReceiver.reset(nullptr);
+}
+
+void MainWindow::on_actChangePort_triggered()
+{
+    _formChangePort = std::make_unique<FormChangePort>(_port, this);
+    connect(_formChangePort.get(), &FormChangePort::onSavePressed, this, &MainWindow::changePort);
+    _formChangePort->show();
+}
+
+void MainWindow::changePort(quint16 port)
+{
+    if (port == _port)
+        return;
+    _port = port;
+    _dataReceiver.reset(nullptr);
+}
+
+void MainWindow::fillComboBoxFunctions()
+{
+    ui->cbFunction->addItem("Случайные данные", static_cast<int>(DataReceiver::Random));
+    ui->cbFunction->addItem("Прямая", static_cast<int>(DataReceiver::Line));
+    ui->cbFunction->addItem("Синус", static_cast<int>(DataReceiver::Sin));
+    ui->cbFunction->addItem("Косинус", static_cast<int>(DataReceiver::Cos));
+}
+
+void MainWindow::on_cbFunction_currentIndexChanged(int index)
+{
+    if (_dataReceiver == nullptr)
+        return;
+    _dataReceiver->setFunction(ui->cbFunction->currentData().toInt());
+}
+
+void MainWindow::fillComboBoxDistributions()
+{
+    ui->cbDistribution->addItem("Без шума", static_cast<int>(DataReceiver::NoDistribution));
+    ui->cbDistribution->addItem("Равномерное", static_cast<int>(DataReceiver::Uniform));
+    ui->cbDistribution->addItem("Нормальное", static_cast<int>(DataReceiver::Normal));
+}
+
+void MainWindow::on_cbDistribution_currentIndexChanged(int index)
+{
+    if (_dataReceiver == nullptr)
+        return;
+    _dataReceiver->setDistribution(ui->cbDistribution->currentData().toInt());
+}
+
+void MainWindow::on_sbStep_valueChanged(double value)
+{
+    if (_dataReceiver == nullptr)
+        return;
+    _dataReceiver->setStep(value);
+}
 
 void MainWindow::on_actScaling_triggered()
 {
     _formScaling = std::make_unique<FormScaling>(_scalingType,
-                   _displayingPointsCount, ui->dataDisplay->yAxis->range().lower,
-                   ui->dataDisplay->yAxis->range().upper, this);
+                                                 _displayingPointsCount, ui->dataDisplay->yAxis->range().lower,
+                                                 ui->dataDisplay->yAxis->range().upper, this);
     connect(_formScaling.get(), &FormScaling::scalingTypeChanged, this, &MainWindow::changeScalingType);
     connect(_formScaling.get(), &FormScaling::yMinChanged,
-        [this](double value)
-        {
-            ui->dataDisplay->yAxis->setRange(value, ui->dataDisplay->yAxis->range().upper);
-        }
+            [this](double value)
+            {
+                ui->dataDisplay->yAxis->setRange(value, ui->dataDisplay->yAxis->range().upper);
+            }
     );
     connect(_formScaling.get(), &FormScaling::yMaxChanged,
-        [this](double value)
-        {
-            ui->dataDisplay->yAxis->setRange(ui->dataDisplay->yAxis->range().lower, value);
-        }
+            [this](double value)
+            {
+                ui->dataDisplay->yAxis->setRange(ui->dataDisplay->yAxis->range().lower, value);
+            }
     );
     _formScaling->show();
 }
@@ -234,7 +230,6 @@ void MainWindow::changeScalingType(FormScaling::Scaling type)
     else
         _axisScaler = [this](){ui->dataDisplay->xAxis->rescale(); };
 }
-
 
 void MainWindow::on_actNoiseProbability_triggered()
 {
@@ -251,9 +246,7 @@ void MainWindow::on_actNoiseProbability_triggered()
     _formProbability->show();
 }
 
-
 void MainWindow::on_cbOpenGl_toggled(bool checked)
 {
     ui->dataDisplay->setOpenGl(checked);
 }
-

@@ -62,7 +62,6 @@ private:
 
     void getData();
 
-    // TODO мб можно переделать используя функцию connectToHost() абстрактного сокета
     QHostAddress _serverAddress;
     quint16 _serverPort;
 

@@ -53,30 +53,26 @@ private:
     void fillComboBoxFunctions();
     void fillComboBoxDistributions();
 
-    static quint16 _port;
-    double _keyStep = 1;
-
     Ui::MainWindow *ui;
-
-    qint32 _serverMaxDowntime;
-    std::unique_ptr<QHostAddress> _serverAddress;
-    quint16 _serverPort;
-    std::unique_ptr<QTimer> _refreshConnectionTimer;
 
     std::unique_ptr<FormConnection> _formConnection;
     std::unique_ptr<FormChangePort> _formChangePort;
-    std::unique_ptr<FormScaling> _formScaling;
 
+    std::unique_ptr<FormScaling> _formScaling;
     FormScaling::Scaling _scalingType = FormScaling::Auto;
-    std::function<void()> _axisScaler;
-    quint16 _displayingPointsCount = 400;
 
     std::unique_ptr<FormNoiseProbability> _formProbability;
     double _noiseProbability = 0.50;
 
+    std::unique_ptr<QHostAddress> _serverAddress;
+    std::unique_ptr<QTimer> _refreshConnectionTimer;
+
+    quint16 _port = 20001;
+    quint16 _displayingPointsCount = 400;
+    double _keyStep = 1;
+    std::function<void()> _axisScaler;
+
     std::unique_ptr<DataReceiver> _dataReceiver;
     QSharedPointer<QCPGraphDataContainer> _graphData;
-    QVector<double> _values = QVector<double>(_displayingPointsCount, 0);
-    QVector<double> _keys = QVector<double>(_displayingPointsCount);
 };
 #endif // MAINWINDOW_H

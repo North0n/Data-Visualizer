@@ -17,7 +17,6 @@ FormConnection::FormConnection(QWidget *parent) :
     ui->lePort->setValidator(_portValidator.get());
 
     // Regular expression for valid IPv4 address
-    // TODO: https://doc.qt.io/qt-5/qlineedit.html#inputMask-prop use mask instead of regexp
     QRegularExpression regExp(R"(^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$)");
     _ipValidator = std::make_unique<QRegularExpressionValidator>(regExp, this);
     ui->leIp->setValidator(_ipValidator.get());

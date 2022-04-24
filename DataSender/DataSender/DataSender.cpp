@@ -3,9 +3,6 @@
 #include <QtConcurrent>
 #include <QDataStream>
 
-int DataSender::_maxDowntimeTime = 30000;
-quint16 DataSender::_sequenceLength = 64;
-
 DataSender::DataSender(quint16 port, const QHostAddress &host, quint16 clientPort, QObject *parent)
     : QObject(parent),
       _port(port),

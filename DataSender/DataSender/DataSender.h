@@ -54,13 +54,15 @@ private:
     quint16 _clientPort;
     QUdpSocket _socket;
 
-    /// Datagram size in amount of values of type double
-    static quint16 _sequenceLength;
+    // Datagram size in amount of values of type double
+    quint16 _sequenceLength = 64;
     DataGenerator _generator;
 
+    // Timer checks every _maxDowntimeTime ms whether were messages from client during this period
+    // or not. If not an object stops sending and emit connection aborted signal
     QTimer _timer;
-    /// Maximum time between client signals, that won't lead to disconnect
-    static int _maxDowntimeTime;
+    // Maximum time between client signals, that won't lead to disconnect
+    qint32 _maxDowntimeTime = 30000;
     bool _hadClientSignal = true;
 
     bool _isConnected = true;
