@@ -21,7 +21,8 @@ QByteArray DataGenerator::line(quint16 length)
 {
     QVector<double> values(length, 0);
     for (auto &value : values)
-        value = _distributions[_currentDistribution]();
+        value = static_cast<int>(noiseDistribution(generator) + _noiseProbability)
+                * _distributions[_currentDistribution]();
 
     return QByteArray(reinterpret_cast<char*>(values.data()), length * sizeof(double));
 }
