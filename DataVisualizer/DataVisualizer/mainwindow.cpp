@@ -260,3 +260,9 @@ void MainWindow::on_actNoiseProbability_triggered()
     _formProbability->show();
 }
 
+
+void MainWindow::on_cbOpenGl_toggled(bool checked)
+{
+    ui->dataDisplay->setOpenGl(checked);
+}
+

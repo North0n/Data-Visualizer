@@ -14,7 +14,7 @@
    <string>DataVisualizer</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QCustomPlot" name="dataDisplay" native="true">
       <property name="sizePolicy">
@@ -181,7 +181,22 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout"/>
+       <widget class="QCheckBox" name="cbOpenGl">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>OpenGl</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="tristate">
+         <bool>false</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="verticalSpacer">

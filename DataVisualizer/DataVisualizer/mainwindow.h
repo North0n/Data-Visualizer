@@ -48,6 +48,8 @@ private slots:
 
     void on_actNoiseProbability_triggered();
 
+    void on_cbOpenGl_toggled(bool checked);
+
 private:
 
     void fillComboBoxFunctions();
