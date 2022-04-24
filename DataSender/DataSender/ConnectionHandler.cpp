@@ -6,6 +6,9 @@
 ConnectionHandler::ConnectionHandler(quint16 port)
     : _port(port)
 {
+    for (int i = 30000; i < 40000; ++i) {
+        _availablePorts.push(i);
+    }
     _receiver.bind(QHostAddress::AnyIPv4, _port);
     connect(&_receiver, &QUdpSocket::readyRead, this, &ConnectionHandler::establishConnection);
     qDebug() << "Waiting for connections on IP: " << getIpAddress().toString() << " port: " << _port;
@@ -20,12 +23,13 @@ void ConnectionHandler::establishConnection()
     auto client = ClientAddress(address.toIPv4Address(), port);
     if (_connectedClients.contains(client))
         return;
-    qDebug() << "Established connection with IP: " << address.toString() << " Port: " << port;
 
-    // TODO изменить алгоритм выдачи порта (_nextDataSenderPort++), потому что, когда порты закончатся
-    //  (переполнится quint16) порты начнут выдаваться с 0, что не есть хорошо. При этом если начать выдавать
-    //  порты опять с того, с которого начинали изначально (30000) может получиться такое, что порт 30000 всё ещё занят
-    _connectedClients[client] = new DataSender(_nextDataSenderPort++, address, port, this);
+    if (_availablePorts.empty())
+        return;
+    _connectedClients[client] = new DataSender(_availablePorts.top(), address, port, this);
+    qDebug() << "Established connection with IP:" << address.toString() << "Port:" << port
+             << "on port" << _availablePorts.top();
+    _availablePorts.pop();
     connect(_connectedClients[client], &DataSender::connectionAborted,
             this, &ConnectionHandler::abortConnection);
     _connectedClients[client]->sendConfiguration();
@@ -44,7 +48,10 @@ QHostAddress ConnectionHandler::getIpAddress()
 
 void ConnectionHandler::abortConnection(const ClientAddress &address)
 {
+    quint16 port = _connectedClients[address]->port();
+    _availablePorts.push(port);
     delete _connectedClients[address];
     _connectedClients.remove(address);
-    qDebug() << "Aborted connection with " << QHostAddress(address.first).toString() << " " << address.second;
+    qDebug() << "Aborted connection with" << QHostAddress(address.first).toString()
+             << address.second << "on port" << port;
 }

@@ -36,10 +36,10 @@ void DataSender::read()
     QDataStream in(&datagram, QIODevice::ReadOnly);
 
     // TODO Добавил эти 4 строчки с мыслью вдруг из-за них крашиться начало
-    if (in.device()->size() >= sizeof(quint8))
+//    if (in.device()->size() >= sizeof(quint8))
         in >> commandIndex;
-    else
-        return;
+//    else
+//        return;
 
     switch (commandIndex) {
         case static_cast<quint8>(Commands::SetFunc):
@@ -108,4 +108,9 @@ void DataSender::abortConnection()
     _isConnected = false;
     _sending.waitForFinished();
     emit connectionAborted(ClientAddress(_clientAddress.toIPv4Address(), _clientPort));
+}
+
+quint16 DataSender::port() const
+{
+    return _port;
 }

@@ -7,6 +7,8 @@
 #include <QMap>
 #include <QPair>
 #include <QList>
+#include <queue>
+#include <vector>
 
 // QPair<quint32 , quint16> stands for a clients IPv4 address and port
 using ClientAddress = QPair<quint32, quint16>;
@@ -26,6 +28,7 @@ private:
     quint16 _port;
     QUdpSocket _receiver;
     quint16 _nextDataSenderPort = 30000;
+    std::priority_queue<quint16, std::vector<quint16>, std::greater<>> _availablePorts;
     QMap<ClientAddress, DataSender*> _connectedClients;
 };
 

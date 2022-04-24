@@ -26,6 +26,8 @@ public:
 
     void startSending();
 
+    quint16 port() const;
+
     enum class Commands
     {
         SetFunc,
