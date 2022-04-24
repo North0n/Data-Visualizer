@@ -2,11 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QHostAddress>
 #include "DataReceiver.h"
 #include "connection.h"
 #include "formchangeport.h"
-#include <QTimer>
 #include "formscaling.h"
 #include "formnoiseprobability.h"
 #include "qcustomplot.h"

@@ -3,7 +3,6 @@
 
 #include <QIntValidator>
 #include <QRegularExpression>
-#include "stylesheet.h"
 
 FormConnection::FormConnection(QWidget *parent) :
     QDialog(parent),
@@ -40,10 +39,4 @@ void FormConnection::on_pbConnect_clicked()
 void FormConnection::on_pbCancel_clicked()
 {
     close();
-}
-
-void FormConnection::setupStylesheet()
-{
-    ui->pbConnect->setStyleSheet(Styles::pushButton);
-    ui->pbCancel->setStyleSheet(Styles::pushButton);
 }

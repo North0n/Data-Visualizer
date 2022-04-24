@@ -2,7 +2,6 @@
 #include "./ui_mainwindow.h"
 
 #include "qdebug.h"
-#include "stylesheet.h"
 #include <algorithm>
 #include <QDataStream>
 

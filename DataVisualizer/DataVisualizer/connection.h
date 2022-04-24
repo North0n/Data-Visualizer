@@ -29,8 +29,6 @@ private slots:
 
 private:
 
-    void setupStylesheet();
-
     Ui::Connection *ui;
     std::unique_ptr<QValidator> _ipValidator;
     std::unique_ptr<QValidator> _portValidator;
