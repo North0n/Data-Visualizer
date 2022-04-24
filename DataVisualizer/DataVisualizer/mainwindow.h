@@ -9,6 +9,7 @@
 #include <QTimer>
 #include "formscaling.h"
 #include "formnoiseprobability.h"
+#include "qcustomplot.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -74,6 +75,7 @@ private:
     double _noiseProbability = 0.50;
 
     DataReceiver *_dataReceiver = nullptr;
+    QSharedPointer<QCPGraphDataContainer> _graphData;
     QVector<double> _values = QVector<double>(_displayingPointsCount, 0);
     QVector<double> _keys = QVector<double>(_displayingPointsCount);
 };

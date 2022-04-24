@@ -5,7 +5,6 @@
 #include "stylesheet.h"
 #include <algorithm>
 #include <QDataStream>
-#include "my_algorithm.h"
 
 quint16 MainWindow::_port = 20001;
 
@@ -14,12 +13,17 @@ MainWindow::MainWindow(QWidget *parent)
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->sbRange->setValue(_displayingPointsCount);
     fillComboBoxFunctions();
     fillComboBoxDistributions();
 
     ui->dataDisplay->addGraph();
-    fillRangeWithStep(_keys.begin(), _keys.end(), 0.0, _keyStep);
-    ui->dataDisplay->graph(0)->setData(_keys, _values);
+    _graphData = ui->dataDisplay->graph(0)->data();
+    _graphData->set(QVector<QCPGraphData>(_displayingPointsCount, {0.0, 0.0}));
+    int i = 0;
+    std::for_each(_graphData->begin(), _graphData->end(),
+                  [&](QCPGraphData &point){point.key += _keyStep * i++; });
+
     ui->dataDisplay->xAxis->setTickLabels(false);
     _axisScaler = [this](){ui->dataDisplay->graph(0)->rescaleAxes(); };
     _axisScaler();
@@ -66,15 +70,20 @@ void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
                >> _serverMaxDowntime
                >> _displayingPointsCount; // Amount of points generated in one datagram
 
-            // DataVisualizer setup
+            // Setting up minimum range, so it couldn't be less than size of one packet,
+            // which arrives from server
             if (ui->sbRange->value() < _displayingPointsCount) {
-                _keys.resize(_displayingPointsCount);
-                fillRangeWithStep(_keys.begin(), _keys.end(), 0.0, _keyStep);
-                _values.resize(_displayingPointsCount);
+                QVector<QCPGraphData> addedData(_displayingPointsCount - ui->sbRange->value(),
+                                                {_graphData->at(0)->key, 0});
+                int i = 1;
+                std::for_each(addedData.rbegin(), addedData.rend(),
+                              [&](QCPGraphData &point){point.key -= _keyStep * i++; });
+                _graphData->add(addedData);
+                ui->sbRange->setMinimum(_displayingPointsCount + 1);
             } else {
+                ui->sbRange->setMinimum(_displayingPointsCount + 1);
                 _displayingPointsCount = ui->sbRange->value();
             }
-            ui->sbRange->setMinimum(_displayingPointsCount);
 
             // Server setup depending on current DataVisualizer setup
             _dataReceiver->setServerPort(_serverPort);
@@ -104,20 +113,22 @@ void MainWindow::connectToServer(const QHostAddress &host, quint16 port)
 void MainWindow::receiveData(const QByteArray &bytes)
 {
     int datagramSize = bytes.size() / sizeof(double);
-    _values.remove(0, datagramSize);
-    _values.append(QVector<double>(reinterpret_cast<const double*>(bytes.begin()),
-                                        reinterpret_cast<const double*>(bytes.end())));
-//    qDebug() << QVector<double>(reinterpret_cast<const double*>(bytes.begin()),
-//                                reinterpret_cast<const double*>(bytes.end()));
+    if (datagramSize <= 0)
+        return;
 
-    // TODO по-хорошему подобные вычисления вынести из этого метода в поле и его изменять при изменении значений спинбоксов
-//    double difference = _displayingPointsCount * _keyStep;
-//    std::rotate(_keys.begin(), _keys.begin() + datagramSize, _keys.end());
-//    std::for_each(_keys.begin() + (_keys.size() - datagramSize), _keys.end(),
-//                     [step = difference](auto &value){value += step;});
+    _graphData->removeBefore((_graphData->begin() + datagramSize)->key);
 
-    ui->dataDisplay->graph(0)->setData(_keys, _values);
+    QVector<double> receivedValues(reinterpret_cast<const double*>(bytes.begin()),
+                                   reinterpret_cast<const double*>(bytes.end()));
+    QVector<QCPGraphData> tempData(datagramSize);
+    double startKey = (_graphData->end() - 1)->key + _keyStep;
+    int i = 0;
+    for (auto it = tempData.begin(); it != tempData.end(); ++it, ++i) {
+        it->key = startKey + i * _keyStep;
+        it->value = receivedValues[i];
+    }
 
+    _graphData->add(tempData, true);
     _axisScaler();
     ui->dataDisplay->replot();
 }
@@ -186,17 +197,16 @@ void MainWindow::on_sbStep_valueChanged(double value)
 
 void MainWindow::on_sbRange_valueChanged(int value)
 {
-    // TODO если я не подписываю ось X, тогда зачем тут _keyStep и вообще можно упростить
     if (value > _displayingPointsCount) {
         int count = value - _displayingPointsCount;
-        _keys.insert(0, count, 0);
-        fillRangeWithStep(_keys.rend() - count, _keys.rend(),
-                          *(_keys.rend() - count - 1) - _keyStep, -_keyStep);
-        _values.insert(0, count, 0);
+        QVector<QCPGraphData> addedData(count,{_graphData->at(0)->key, 0});
+        int i = 1;
+        std::for_each(addedData.rbegin(), addedData.rend(),
+                      [&](QCPGraphData &point){point.key -= _keyStep * i++; });
+        _graphData->add(addedData);
     } else if (value < _displayingPointsCount) {
         int count = _displayingPointsCount - value;
-        _keys.remove(0, count);
-        _values.remove(0, count);
+        _graphData->removeBefore((_graphData->begin() + count)->key);
     }
     _displayingPointsCount = value;
 }

@@ -9,9 +9,8 @@
 class DataGenerator
 {
 public:
-    /**
-     * Generates a sequence of random double values of length @b length
-     */
+
+    // length parameter in following functions refers to the length of generated sequence
     QByteArray line(quint16 length);
 
     QByteArray random(quint16 length);
