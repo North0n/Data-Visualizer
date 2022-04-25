@@ -19,6 +19,10 @@ public:
 
     QByteArray cos(quint16 length);
 
+    QByteArray square(quint16 length);
+
+    QByteArray sawtooth(quint16 length);
+
     QByteArray getData(quint16 length);
 
     void setFuncIndex(int index);
@@ -37,6 +41,8 @@ private:
             [this](quint16 length) {return line(length); },
             [this](quint16 length) {return sin(length); },
             [this](quint16 length) {return cos(length); },
+            [this](quint16 length) {return square(length); },
+            [this](quint16 length) {return sawtooth(length); },
         };
     int _currentFunc = 0;
 

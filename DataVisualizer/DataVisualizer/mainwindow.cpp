@@ -171,6 +171,8 @@ void MainWindow::fillComboBoxFunctions()
     ui->cbFunction->addItem("Прямая", static_cast<int>(DataReceiver::Line));
     ui->cbFunction->addItem("Синус", static_cast<int>(DataReceiver::Sin));
     ui->cbFunction->addItem("Косинус", static_cast<int>(DataReceiver::Cos));
+    ui->cbFunction->addItem("Дискретный", static_cast<int>(DataReceiver::Square));
+    ui->cbFunction->addItem("Пилообразный", static_cast<int>(DataReceiver::Sawtooth));
 }
 
 void MainWindow::on_cbFunction_currentIndexChanged(int index)

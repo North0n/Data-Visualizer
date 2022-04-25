@@ -31,13 +31,7 @@ void DataSender::read()
     // Handles received command
     quint8 commandIndex;
     QDataStream in(&datagram, QIODevice::ReadOnly);
-
-    // TODO Добавил эти 4 строчки с мыслью вдруг из-за них крашиться начало
-//    if (in.device()->size() >= sizeof(quint8))
-        in >> commandIndex;
-//    else
-//        return;
-
+    in >> commandIndex;
     switch (commandIndex) {
         case static_cast<quint8>(Commands::SetFunc):
             quint8 funcIndex;
@@ -79,7 +73,7 @@ void DataSender::sendConfiguration()
 
 void DataSender::startSending()
 {
-    _sending = QtConcurrent::run([this] { send(); });
+    _sending = QtConcurrent::run(&DataSender::send, this);
 }
 
 void DataSender::send()

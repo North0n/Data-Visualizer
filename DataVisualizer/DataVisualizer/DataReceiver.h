@@ -46,6 +46,8 @@ public:
         Line,
         Sin,
         Cos,
+        Square,
+        Sawtooth,
     };
 
     enum Distributions
